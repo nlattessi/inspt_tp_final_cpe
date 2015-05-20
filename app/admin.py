@@ -10,11 +10,6 @@ class EstadoAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
 
 
-class VendedorAdmin(admin.ModelAdmin):
-    model = Vendedor
-    list_display = ('legajo', 'nombre', 'apellido')
-
-
 class CentroDistribucionAdmin(admin.ModelAdmin):
     model = CentroDistribucion
     list_display = ('nombre',)
@@ -22,12 +17,18 @@ class CentroDistribucionAdmin(admin.ModelAdmin):
 
 class HandheldAdmin(admin.ModelAdmin):
     model = Handheld
-    list_display = ('numero_de_serie', 'modelo', 'marca', 'fecha_ultimo_cambio', 'estado', 'vendedor', 'centro_distribucion')
+    list_display = ('numero_de_serie', 'modelo', 'marca', 'fecha_ultimo_cambio', 'estado', 'centro_distribucion',)
 
 
 class ImpresoraAdmin(admin.ModelAdmin):
     model = Impresora
-    list_display = ('numero_de_serie', 'modelo', 'marca', 'fecha_ultimo_cambio', 'estado', 'vendedor', 'centro_distribucion')
+    list_display = ('numero_de_serie', 'modelo', 'marca', 'fecha_ultimo_cambio', 'estado', 'centro_distribucion',)
+
+
+class VendedorAdmin(admin.ModelAdmin):
+    model = Vendedor
+    list_display = ('legajo', 'nombre', 'apellido', 'handheld', 'impresora')
+
 
 class IncidenteAdmin(admin.ModelAdmin):
     model = Estado

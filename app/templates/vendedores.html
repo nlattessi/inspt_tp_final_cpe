@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block titulo %}Vendedores - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1>Lista Vendedores</h1>
+    {% for vendedor in vendedores %}
+        <h2>
+            <a href="{% url 'vendedor' id=vendedor.id %}">
+                {{ vendedor.legajo }}
+            </a>
+        </h2>
+        <p><u>Nombre</u>: {{ vendedor.nombre }} {{ vendedor.apellido }}</p>
+        {% if vendedor.handheld %}
+            <p><u>Handheld asignada</u>: <a href="{% url 'handheld' id=vendedor.handheld.id %}">{{ vendedor.handheld.numero_de_serie }}</a></p>
+        {% else %}
+            <p><u>Sin asignar handheld</u></p>
+        {% endif %}
+        {% if vendedor.impresora %}
+            <p><u>Impresora asignada</u>: <a href="{% url 'impresora' id=vendedor.impresora.id %}">{{ vendedor.impresora.numero_de_serie }}</a></p>
+        {% else %}
+            <p><u>Sin asignar impresora</u></p>
+        {% endif %}
+        {% if vendedor.centro_distribucion %}
+            <p><u>Opera en</u>: {{ vendedor.centro_distribucion }}</p>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block titulo %}Impresora - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1><u>Impresora</u>: {{ impresora.numero_de_serie }}</h1>
+    <p><u>Modelo</u>: {{ impresora.modelo }}</p>
+    <p><u>Marca</u>: {{ impresora.marca }}</p>
+    <p><u>Fecha del ultimo cambio</u>: {{ impresora.fecha_ultimo_cambio }}</p>
+    <p><u>Estado</u>: {{ impresora.estado }}</p>
+    {% if impresora.vendedor %}
+        <p><u>Asignada a</u>: <a href="{% url 'vendedor' id=impresora.vendedor.id %}">{{ impresora.vendedor }}</a></p>
+    {% else %}
+        <p><u>Sin asignar</u></p>
+    {% endif %}
+    {% if impresora.centro_distribucion %}
+            <p><u>Se encuentra en el CD</u>: {{ impresora.centro_distribucion }}</p>
+        {% else %}
+            <p><u>No se encuentra en ningun CD</u></p>
+        {% endif %}
+    <hr>
+    <ul>
+        <li><a href="{% url 'impresora_cambiar_estado' id=impresora.id %}">Cambiar estado</a></li>
+        <li><a href="{% url 'impresora_cambiar_vendedor' id=impresora.id %}">Asignar a otro vendedor</a></li>
+        <li><a href="{% url 'impresora_cargar_incidente' id=impresora.id %}">Crear incidente para esta impresora
+    </ul>
+    
+{% endblock %}

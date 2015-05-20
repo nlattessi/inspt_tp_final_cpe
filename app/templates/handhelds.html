@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block titulo %}Handhelds - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1>Lista Handhelds</h1>
+    {% include "_handheld_buscar.html" %}
+    {% for handheld in handhelds %}
+        <h2>
+            <a href="{% url 'handheld' id=handheld.id %}">
+                {{ handheld.numero_de_serie }}
+            </a>
+        </h2>
+        <p><u>Modelo</u>: {{ handheld.modelo }}</p>
+        <p><u>Marca</u>: {{ handheld.marca }}</p>
+        <p><u>Fecha del ultimo cambio</u>: {{ handheld.fecha_ultimo_cambio }}</p>
+        <p><u>Estado</u>: {{ handheld.estado }}</p>
+        {% if handheld.vendedor %}
+            <p><u>Asignada a</u>: <a href="{% url 'handheld' id=handheld.vendedor.id %}">{{ handheld.vendedor }}</a></p>
+        {% else %}
+            <p><u>Sin asignar</u></p>
+        {% endif %}
+        {% if handheld.centro_distribucion %}
+            <p><u>Se encuentra en el CD</u>: {{ handheld.centro_distribucion }}</p>
+        {% else %}
+            <p><u>No se encuentra en ningun CD</u></p>
+        {% endif %}
+    {% empty %}
+        <p>No se encuentran handhelds</p>
+    {% endfor %}
+{% endblock %}

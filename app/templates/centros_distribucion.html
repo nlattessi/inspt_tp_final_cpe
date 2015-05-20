@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block titulo %}CDs - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1>Lista Centros de Distribucion</h1>
+    {% for centro in centros_distribucion %}
+        <p><u>Nombre</u>: {{ centro.nombre }}</p>
+    {% endfor %}
+{% endblock %}

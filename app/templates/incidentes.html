@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block titulo %}Incidentes - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1>Lista Incidentes</h1>
+    {% for incidente in incidentes %}
+        <h2>
+            <a href="{% url 'incidente' id=incidente.id %}">
+                {{ incidente.id }}
+            </a>
+        </h2>
+        <p><u>Descripcion</u>: {{ incidente.descripcion }}</p>
+        <p><u>Solucion</u>: {{ incidente.solucion }}</p>
+        {% if incidente.handheld %}
+            <p><u>Handheld relacionada</u>: <a href="{% url 'handheld' id=incidente.handheld.id %}">{{ incidente.handheld.numero_de_serie }}</a></p>
+        {% endif %}
+        {% if incidente.impresora %}
+            <p><u>Impresora relacionada</u>: <a href="{% url 'impresora' id=incidente.impresora.id %}">{{ incidente.impresora.numero_de_serie }}</a></p>
+        {% endif %}
+        {% if incidente.vendedor %}
+            <p><u>Vendedor relacionado</u>: <a href="{% url 'vendedor' id=incidente.vendedor.id %}">{{ incidente.vendedor }}</a></p>
+        {% endif %}
+        <p><u>Creado por</u>: {{ incidente.usuario }}</p>
+        <p><u>Fecha de carga</u>: {{ incidente.fecha_carga }}</p>
+    {% endfor %}
+{% endblock %}

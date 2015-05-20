@@ -1,4 +1,4 @@
-omport os
+import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cpe.settings')
 
 import django
@@ -15,9 +15,6 @@ def populate():
     
     for i in range(0,3):
         add_estado(nombre=faker.word())
-    
-    for i in range(0,5):
-        add_vendedor(legajo=faker.unix_time(), nombre=faker.first_name(), apellido=faker.last_name())
 
     for i in range(0,10):
         add_centro_distribucion(nombre=faker.city())
@@ -32,6 +29,9 @@ def populate():
             modelo=faker.word(),
             marca=faker.word())
 
+    for i in range(0,5):
+        add_vendedor(legajo=faker.unix_time(), nombre=faker.first_name(), apellido=faker.last_name())
+
     for i in range(0, 50):
         add_incidente(descripcion=faker.text(),
             solucion=faker.text())
@@ -40,10 +40,6 @@ def populate():
 def add_estado(nombre):
     e = Estado.objects.get_or_create(nombre=nombre)[0]
     return e
-
-def add_vendedor(legajo, nombre, apellido):
-    v = Vendedor.objects.get_or_create(legajo=legajo, nombre=nombre, apellido=apellido)
-    return v
 
 def add_centro_distribucion(nombre):
     cd = CentroDistribucion.objects.get_or_create(nombre=nombre)
@@ -54,16 +50,29 @@ def add_handheld(numero_de_serie, modelo, marca):
         modelo=modelo,
         marca=marca,
         estado=Estado.objects.order_by('?')[0],
-        vendedor=Vendedor.objects.order_by('?')[0],
-        centro_distribucion=CentroDistribucion.objects.order_by('?')[0])
+        centro_distribucion=CentroDistribucion.objects.order_by('?')[0],
+    )
+    return h
 
 def add_impresora(numero_de_serie, modelo, marca):
-    h = Impresora.objects.get_or_create(numero_de_serie=numero_de_serie,
+    i = Impresora.objects.get_or_create(numero_de_serie=numero_de_serie,
         modelo=modelo,
         marca=marca,
         estado=Estado.objects.order_by('?')[0],
-        vendedor=Vendedor.objects.order_by('?')[0],
-        centro_distribucion=CentroDistribucion.objects.order_by('?')[0])
+        # vendedor=Vendedor.objects.order_by('?')[0],
+        centro_distribucion=CentroDistribucion.objects.order_by('?')[0],
+    )
+    return i
+
+def add_vendedor(legajo, nombre, apellido):
+    v = Vendedor.objects.get_or_create(legajo=legajo,
+        nombre=nombre,
+        apellido=apellido,
+        #handheld=Handheld.objects.order_by('?')[0],
+        #impresora=Impresora.objects.order_by('?')[0],
+        #centro_distribucion=CentroDistribucion.objects.order_by('?')[0],
+    )
+    return v
 
 def add_incidente(descripcion, solucion):
     i = Incidente.objects.get_or_create(descripcion=descripcion,

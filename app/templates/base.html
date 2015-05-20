@@ -1,0 +1,28 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block titulo %}CPE{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+<header>
+    <h1>CPE menu</h1>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'handhelds' %}">Handhelds</a></li>
+            <li><a href="{% url 'impresoras' %}">Impresoras</a></li>
+            <li><a href="{% url 'centros_distribucion' %}">Centros de distribucion</a></li>
+            <li><a href="{% url 'vendedores' %}">Vendedores</a></li>
+            <li><a href="{% url 'incidentes' %}">Incidentes</a></li>
+            <li><a href="{% url 'cargar_incidente' %}">Cargar incidente</a></li>
+            <li><a href="{% url 'home' %}">Generar reporte</a></li>            
+        </ul>
+    </nav>
+</header>
+<hr>
+{% block contenido %}{% endblock %}
+</body>
+</html>

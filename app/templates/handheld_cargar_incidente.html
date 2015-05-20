@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block titulo %}Cargar Incidente Handheld- {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1><u>Cargar incidente para Handheld</u>: {{ handheld.numero_de_serie }}</h1>
+    <form role="form" action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Cargar</button>
+    </form>
+{% endblock %}
