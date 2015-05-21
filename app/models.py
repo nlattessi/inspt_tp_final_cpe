@@ -24,7 +24,6 @@ class Handheld(models.Model):
     marca = models.CharField(max_length=255, blank=True)
     fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
     estado = models.ForeignKey(Estado)
-    #vendedor = models.ForeignKey(Vendedor)
     centro_distribucion = models.ForeignKey(CentroDistribucion, blank=True, null=True)
 
     def get_absolute_url(self):
@@ -50,7 +49,6 @@ class Impresora(models.Model):
     marca = models.CharField(max_length=255, blank=True)
     fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
     estado = models.ForeignKey(Estado)
-    #vendedor = models.ForeignKey(Vendedor)
     centro_distribucion = models.ForeignKey(CentroDistribucion, blank=True, null=True)
 
     def __str__(self):
@@ -73,7 +71,6 @@ class Vendedor(models.Model):
     apellido = models.CharField(max_length=255, blank=True)
     handheld = models.OneToOneField(Handheld, blank=True, null=True)
     impresora = models.OneToOneField(Impresora, blank=True, null=True)
-    #centro_distribucion = models.ForeignKey(CentroDistribucion, blank=True, null=True)
 
     def __str__(self):
         return "{}, {} {}".format(self.legajo, self.nombre, self.apellido)
