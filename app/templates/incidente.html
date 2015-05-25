@@ -7,9 +7,6 @@
     {% if incidente.handheld %}
         <p><u>Handheld relacionada</u>: <a href="{% url 'handheld' id=incidente.handheld.id %}">{{ incidente.handheld.numero_de_serie }}</a></p>
     {% endif %}
-    {% if incidente.impresora %}
-        <p><u>Impresora relacionada</u>: <a href="{% url 'impresora' id=incidente.impresora.id %}">{{ incidente.impresora.numero_de_serie }}</a></p>
-    {% endif %}
     {% if incidente.vendedor %}
         <p><u>Vendedor relacionado</u>: <a href="{% url 'vendedor' id=incidente.vendedor.id %}">{{ incidente.vendedor }}</a></p>
     {% endif %}

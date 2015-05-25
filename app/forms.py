@@ -1,5 +1,5 @@
 from django import forms
-from app.models import (Handheld, Vendedor, Impresora, Incidente)
+from app.models import (Handheld, Vendedor, Incidente)
 
 
 class HandheldForm(forms.ModelForm):
@@ -9,6 +9,7 @@ class HandheldForm(forms.ModelForm):
 
 
 class HandheldCambiarEstadoForm(forms.ModelForm):
+    observacion = forms.CharField(required=False, widget=forms.Textarea)
     class Meta:
         model = Handheld
         fields = ('estado',)
@@ -25,22 +26,22 @@ class HandheldCambiarVendedorForm(forms.Form):
                     queryset=Vendedor.objects.filter(handheld=None))
 
 
-class ImpresoraCambiarEstadoForm(forms.ModelForm):
-    class Meta:
-        model = Impresora
-        fields = ('estado',)
+# class ImpresoraCambiarEstadoForm(forms.ModelForm):
+#     class Meta:
+#         model = Impresora
+#         fields = ('estado',)
 
 
-class ImpresoraCambiarCentroDistribucionForm(forms.ModelForm):
-    class Meta:
-        model = Impresora
-        fields = ('estado',)
+# class ImpresoraCambiarCentroDistribucionForm(forms.ModelForm):
+#     class Meta:
+#         model = Impresora
+#         fields = ('estado',)
 
 
-class ImpresoraCambiarVendedorForm(forms.Form):
-    vendedor = forms.ModelChoiceField(label="Asignar a: ",
-                    queryset=Vendedor.objects.filter(impresora=None),
-                    required=False)
+# class ImpresoraCambiarVendedorForm(forms.Form):
+#     vendedor = forms.ModelChoiceField(label="Asignar a: ",
+#                     queryset=Vendedor.objects.filter(impresora=None),
+#                     required=False)
 
 
 class IncidenteCargarForm(forms.ModelForm):
@@ -52,4 +53,4 @@ class IncidenteCargarForm(forms.ModelForm):
 class DispositivoCargarIncidenteForm(forms.ModelForm):
     class Meta:
         model = Incidente
-        exclude = ['usuario', 'handheld', 'fecha_carga', 'impresora']
+        exclude = ['usuario', 'handheld', 'fecha_carga']

@@ -8,9 +8,4 @@
     {% else %}
         <p><u>Sin asignar handheld</u></p>
     {% endif %}
-    {% if vendedor.impresora %}
-        <p><u>Impresora asignada</u>: <a href="{% url 'impresora' id=vendedor.impresora.id %}">{{ vendedor.impresora.numero_de_serie }}</a></p>
-    {% else %}
-        <p><u>Sin asignar impresora</u></p>
-    {% endif %}
 {% endblock %}
