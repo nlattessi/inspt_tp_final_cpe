@@ -8,6 +8,13 @@ class HandheldForm(forms.ModelForm):
         exclude = ['fecha_ultimo_cambio']
 
 
+class HandheldFormAdmin(forms.ModelForm):
+    numero_de_serie =forms.CharField(min_length=11, max_length=11)
+    class Meta:
+        model = Handheld
+        fields = ('numero_de_serie',)
+
+
 class HandheldCambiarEstadoForm(forms.ModelForm):
     observacion = forms.CharField(required=False, widget=forms.Textarea)
     class Meta:
@@ -24,24 +31,6 @@ class HandheldCambiarCentroDistribucionForm(forms.ModelForm):
 class HandheldCambiarVendedorForm(forms.Form):
     vendedor = forms.ModelChoiceField(label="Asignar a: ",
                     queryset=Vendedor.objects.filter(handheld=None))
-
-
-# class ImpresoraCambiarEstadoForm(forms.ModelForm):
-#     class Meta:
-#         model = Impresora
-#         fields = ('estado',)
-
-
-# class ImpresoraCambiarCentroDistribucionForm(forms.ModelForm):
-#     class Meta:
-#         model = Impresora
-#         fields = ('estado',)
-
-
-# class ImpresoraCambiarVendedorForm(forms.Form):
-#     vendedor = forms.ModelChoiceField(label="Asignar a: ",
-#                     queryset=Vendedor.objects.filter(impresora=None),
-#                     required=False)
 
 
 class IncidenteCargarForm(forms.ModelForm):
