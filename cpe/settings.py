@@ -106,3 +106,7 @@ STATIC_URL = '/static/'
 
 FAKER_LOCALE = None     # settings.LANGUAGE_CODE is loaded
 FAKER_PROVIDERS = None  # faker.DEFAULT_PROVIDERS is loaded (all)
+
+
+# Custom Auth Model
+AUTH_USER_MODEL = 'app.MyUser'

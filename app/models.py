@@ -1,7 +1,70 @@
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
 from django.core.validators import RegexValidator
+
+
+class MyUserManager(BaseUserManager):
+    def create_user(self, username, password=None):
+        """
+        Creates and saves a User with the given username and password.
+        """
+        if not username:
+            raise ValueError('Users must have an username.')
+
+        user = self.model(
+            username=username,
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, password):
+        """
+        Creates and saves a superuser with the given username and password.
+        """
+        user = self.create_user(username=username, password=password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+
+class MyUser(AbstractBaseUser):
+    username = models.CharField(max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    objects = MyUserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
+
+    def get_full_name(self):
+        # The user is identified by ther username
+        return self.username
+
+    def get_short_name(self):
+        # The user is identified by ther username
+        return self.username
+
+    def __str__(self):
+        return self.username
+
+    def has_perm(self, perm, obj=None):
+        # Does the user have a specific permission?
+        # Simplest possible answer: Yes, always
+        return True
+
+    def has_module_perms(self, app_label):
+        # Does the user have permissions to view the app 'app_label'?
+        # Simplest possible answer: Yes, always
+        return True
+
+    @property
+    def is_staff(self):
+        # Is the user a member of staff?
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
 
 
 class Estado(models.Model):
@@ -88,7 +151,7 @@ class Incidente(models.Model):
     solucion = models.TextField()
     handheld = models.ForeignKey(Handheld, blank=True, null=True)
     vendedor = models.ForeignKey(Vendedor, blank=True, null=True)
-    usuario = models.ForeignKey(User, blank=True, null=True)
+    usuario = models.ForeignKey(MyUser, blank=True, null=True)
     fecha_carga = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

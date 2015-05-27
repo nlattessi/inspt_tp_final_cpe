@@ -5,15 +5,15 @@ import string
 import django
 django.setup()
 from faker import Factory
-from django.contrib.auth.models import User
 from app.models import (Estado, Vendedor, CentroDistribucion,
                         Handheld, TipoIncidente, Incidente,
-                        ModalidadVendedor)
+                        ModalidadVendedor, MyUser)
 
 
 def popular():
     flush_base()
     crear_superuser()
+    crear_usuarios()
     crear_estados()
     crear_centros_distribucion()
     agregar_handhelds()
@@ -29,8 +29,15 @@ def flush_base():
 
 def crear_superuser():
     print("Creando superuser...")
-    User.objects.create_superuser('admin', 'admin@admin.com', 'admin')
+    MyUser.objects.create_superuser('admin', 'admin')
 
+def crear_usuarios():
+    print("Creando usuarios...")
+    MyUser.objects.create_user('test', 'test')
+    MyUser.objects.create_user('demo', 'demo')
+    MyUser.objects.create_user('prueba1', 'prueba1')
+    MyUser.objects.create_user('prueba2', 'prueba2')
+    MyUser.objects.create_user('prueba3', 'prueba3')
 
 def crear_estados():
     print("Creando estados...")
@@ -105,14 +112,16 @@ def agregar_incidentes():
     tipos = TipoIncidente.objects.all()
     handhelds = Handheld.objects.all()
     vendedores = Vendedor.objects.all()
-    creador = User.objects.get(username='admin')
+    usuarios = MyUser.objects.filter(is_admin=False)
+    #creador = User.objects.get(username='admin')
     for i in range(0, 50):
         tipo = faker.random_element(tipos)
         descripcion = faker.text()
         solucion = faker.text()
         handheld = faker.random_element(handhelds)
         vendedor = faker.random_element(vendedores)
-        usuario = creador
+        #usuario = creador
+        usuario = faker.random_element(usuarios)
         Incidente.objects.get_or_create(tipo=tipo,
                                         descripcion=descripcion,
                                         solucion=solucion,
@@ -124,4 +133,4 @@ def agregar_incidentes():
 if __name__ == '__main__':
     print ("Ejecutando el script para popular la base...\n")
     popular()
-    print("Base populada!")
+    print("\nBase populada!")
