@@ -38,7 +38,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'django_faker',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -104,9 +103,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-FAKER_LOCALE = None     # settings.LANGUAGE_CODE is loaded
-FAKER_PROVIDERS = None  # faker.DEFAULT_PROVIDERS is loaded (all)
+#FAKER_LOCALE = None     # settings.LANGUAGE_CODE is loaded
+#FAKER_PROVIDERS = None  # faker.DEFAULT_PROVIDERS is loaded (all)
 
 
 # Custom Auth Model
 AUTH_USER_MODEL = 'app.MyUser'
+
+# Auth URLs
+LOGIN_REDIRECT_URL = 'app.views.home'

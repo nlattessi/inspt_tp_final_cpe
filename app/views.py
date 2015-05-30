@@ -1,4 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
+from django.contrib.auth import logout
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import ListView
 from app.models import (Handheld, Vendedor, Incidente, CentroDistribucion,
                         HandheldCambioEstado)
@@ -11,7 +18,7 @@ from app.forms import (HandheldForm, HandheldCambiarEstadoForm,
 def home(request):
     return render(request, 'home.html')
 
-
+@login_required
 def centros_distribucion(request):
     centros_distribucion = CentroDistribucion.objects.order_by('nombre')
     return render(request, 'centros_distribucion.html', {
@@ -19,6 +26,7 @@ def centros_distribucion(request):
     })
 
 
+@login_required
 def handhelds(request):
     handhelds = Handheld.objects.order_by('fecha_ultimo_cambio')
     return render(request, 'handhelds.html', {
@@ -26,6 +34,7 @@ def handhelds(request):
     })
 
 
+@login_required
 def handheld(request, id):
     handheld = get_object_or_404(Handheld, pk=id)
     return render(request, 'handheld.html', {
@@ -33,6 +42,7 @@ def handheld(request, id):
     })
 
 
+@login_required
 def handheld_cambiar_estado(request, id):
     handheld = get_object_or_404(Handheld, pk=id)
     form_class = HandheldCambiarEstadoForm
@@ -56,6 +66,7 @@ def handheld_cambiar_estado(request, id):
     })
 
 
+@login_required
 def handheld_cambiar_vendedor(request, id):
     handheld = get_object_or_404(Handheld, pk=id)
     vendedor_actual = Vendedor.objects.filter(handheld=handheld)
@@ -78,6 +89,7 @@ def handheld_cambiar_vendedor(request, id):
     })
 
 
+@login_required
 def handheld_cargar_incidente(request, id):
     handheld = get_object_or_404(Handheld, pk=id)
     form_class = DispositivoCargarIncidenteForm
@@ -96,83 +108,8 @@ def handheld_cargar_incidente(request, id):
         'handheld': handheld,
     })
 
-# def impresoras(request):
-#     impresoras = Impresora.objects.order_by('fecha_ultimo_cambio')
-#     return render(request, 'impresoras.html', {
-#         'impresoras': impresoras,
-#     })
 
-# def impresora(request, id):
-#     impresora = get_object_or_404(Impresora, pk=id)
-#     return render(request, 'impresora.html', {
-#         'impresora': impresora,
-#     })
-
-# def impresora_cambiar_estado(request, id):
-#     impresora = get_object_or_404(Impresora, pk=id)
-#     form_class = ImpresoraCambiarEstadoForm
-#     if request.method == 'POST':
-#         form = form_class(data=request.POST, instance=impresora)
-#         if form.is_valid():
-#             estado_anterior = impresora.estado
-#             form.save()
-#             nuevo_registro_historico = ImpresoraCambioEstado(
-#                 impresora=impresora,
-#                 estado_anterior=estado_anterior,
-#                 nuevo_estado=form.cleaned_data['estado'])
-#             nuevo_registro_historico.save()
-#             return redirect('impresora', id=impresora.id)
-#     else:
-#         form = form_class(instance=impresora)
-#     return render(request, 'impresora_cambiar_estado.html', {
-#         'impresora': impresora,
-#         'form': form,
-#     })
-
-# def impresora_cambiar_vendedor(request, id):
-#     impresora = get_object_or_404(Impresora, pk=id)
-#     vendedor_actual = Vendedor.objects.filter(impresora=impresora)
-#     form_class = ImpresoraCambiarVendedorForm
-#     if request.method == 'POST':
-#         form = form_class(request.POST)
-#         if form.is_valid():
-#             vendedor_nuevo = form.cleaned_data['vendedor']
-#             if vendedor_actual:
-#                 vendedor_actual[0].impresora = None
-#                 vendedor_actual[0].save()
-#             if vendedor_nuevo:
-#                 vendedor_nuevo.impresora = impresora
-#                 vendedor_nuevo.save()
-#             else:
-#                 vendedor_actual[0].impresora = None
-#                 vendedor_actual[0].save()
-#             return redirect('impresora', id=impresora.id)
-#     else:
-#         form = form_class
-#     return render(request, 'impresora_cambiar_vendedor.html', {
-#         'impresora': impresora,
-#         'form': form,
-#     })
-
-# def impresora_cargar_incidente(request, id):
-#     impresora = get_object_or_404(Impresora, pk=id)
-#     form_class = DispositivoCargarIncidenteForm
-#     if request.method == 'POST':
-#         form = form_class(request.POST)
-#         if form.is_valid():
-#             incidente = form.save(commit=False)
-#             incidente.user = request.user
-#             incidente.impresora = impresora
-#             incidente.save()
-#             return redirect('incidente', id=incidente.id)
-#     else:
-#         form = form_class()
-#     return render(request, 'impresora_cargar_incidente.html', {
-#         'form': form,
-#         'impresora': impresora,
-#     })
-
-
+@login_required
 def vendedores(request):
     vendedores = Vendedor.objects.order_by('legajo')
     return render(request, 'vendedores.html', {
@@ -180,6 +117,7 @@ def vendedores(request):
     })
 
 
+@login_required
 def vendedor(request, id):
     vendedor = get_object_or_404(Vendedor, pk=id)
     return render(request, 'vendedor.html', {
@@ -187,6 +125,7 @@ def vendedor(request, id):
     })
 
 
+@login_required
 def incidentes(request):
     incidentes = Incidente.objects.order_by('fecha_carga')
     return render(request, 'incidentes.html', {
@@ -194,6 +133,7 @@ def incidentes(request):
     })
 
 
+@login_required
 def incidente(request, id):
     incidente = Incidente.objects.get(id=id)
     incidente = get_object_or_404(Incidente, pk=id)
@@ -202,6 +142,7 @@ def incidente(request, id):
     })
 
 
+@login_required
 def cargar_incidente(request):
     form_class = IncidenteCargarForm
     if request.method == 'POST':
@@ -216,6 +157,52 @@ def cargar_incidente(request):
     return render(request, 'cargar_incidente.html', {
         'form': form,
     })
+
+
+# def login(request):
+#     if request.method == 'POST':
+#         usuario = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(username=usuario, password=password)
+#         if user:
+#             if user.is_active:
+#                 auth_login(request, user)
+#                 return redirect('home')
+#             else:
+#                 print ("Invalid login details: {0}, {1}".format(username, password))
+#                 return HttpResponse("Tu cuenta esta desactivada.")
+#         else:
+#             return HttpResponse("Datos suministrados invalidos.")
+#     return render(request, 'login.html')
+
+    #     form = form_class(request.POST)
+    #     print(form)
+    #     print(form.is_valid())
+    #     print(request.POST['username'])
+    #     if form.is_valid():
+    #         usuario = request.POST['username']
+    #         password = request.POST['password']
+    #         user = authenticate(username=usuario, password=password)
+    #         print(usuario, password, user)
+    #         if user:
+    #             if user.is_active:
+    #                 auth_login(request, user)
+    #                 return redirect('home')
+    #             else:
+    #                 return HttpResponse("Tu cuenta esta desactivada.")
+    #         else:
+    #             print ("Invalid login details: {0}, {1}".format(username, password))
+    #             return HttpResponse("Datos suministrados invalidos.")
+    # else:
+    #     form = form_class()
+    # return render(request, 'login.html', {
+    #     'form': form,
+    # })
+
+# @login_required
+# def logout(request):
+#     auth_logout(request)
+#     return redirect('home')
 
 
 class HandheldListView(ListView):

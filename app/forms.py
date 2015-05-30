@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.forms import AuthenticationForm
 from .models import (Handheld, Vendedor, Incidente)
 
 from app.models import MyUser
@@ -92,3 +93,9 @@ class DispositivoCargarIncidenteForm(forms.ModelForm):
     class Meta:
         model = Incidente
         exclude = ['usuario', 'handheld', 'fecha_carga']
+
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(label=("Username"),
+                               max_length=30,
+                               widget=forms.TextInput(attrs={'class': 'loginput'}))
