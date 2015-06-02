@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block titulo %}Denegado - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1>Acceso denegado</h1>
+    <h2>Solo se permite acceso a un usuario Administrador</h2>
+    <ul>
+    <li><a href="{% url 'home' %}">Volver a Home</a></li>
+    <li><a href="{% url 'login' %}">Loguearse nuevamente</a></li>
+    </ul>
+{% endblock %}

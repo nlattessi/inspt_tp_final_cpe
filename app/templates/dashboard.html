@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block titulo %}Dashboard - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1>Dashboard</h1>
+    <table>
+        <tr>
+            <th>Sucursal</th>
+            {% for estado in estados %}
+                <th>{{ estado.nombre }}</th>
+            {% endfor %}
+        </tr>
+        {% for sucursal, estados in data.items %}
+            <tr>
+                <td>{{ sucursal.nombre }}</td>
+                {% for estado, cant in estados.items %}
+                    <td>{{ cant }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <p>Total Handhelds: {{ total_handhelds }}</p>
+
+{% endblock %}

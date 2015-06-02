@@ -1,145 +1,85 @@
+from functools import wraps
+from datetime import datetime, timedelta, time
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
-from django.contrib.auth import logout
-from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib import messages
+from django.utils.decorators import method_decorator
 from django.views.generic import ListView
-from app.models import (Handheld, Vendedor, Incidente, CentroDistribucion,
-                        HandheldCambioEstado)
-from app.forms import (HandheldForm, HandheldCambiarEstadoForm,
-                       HandheldCambiarCentroDistribucionForm,
-                       HandheldCambiarVendedorForm, IncidenteCargarForm,
-                       DispositivoCargarIncidenteForm)
+from django.views.generic.base import TemplateView
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.forms import AuthenticationForm
+from app.models import (Handheld, Vendedor, Incidente, Sucursal,
+                        HandheldCambioEstado, Estado)
+from app.forms import (HandheldCambiarEstadoForm,
+                       HandheldMoverSucursalForm,
+                       IncidenteCargarForm,
+                       VendedorCambiarHandheldForm)
 
 
-def home(request):
-    return render(request, 'home.html')
+def login_and_admin(view_func):
+    @login_required
+    @user_passes_test(
+        lambda u: u.is_admin,
+        login_url='/denegado/',
+        redirect_field_name=None)
+    @wraps(view_func)
+    def new_view_func(request, *args, **kwargs):
+        response = view_func(request, *args, **kwargs)
+        return response
+    return new_view_func
 
-@login_required
-def centros_distribucion(request):
-    centros_distribucion = CentroDistribucion.objects.order_by('nombre')
-    return render(request, 'centros_distribucion.html', {
-        'centros_distribucion': centros_distribucion,
+class AdminRequiredMixin(object):
+    @method_decorator(login_required)
+    @method_decorator(user_passes_test(lambda u: u.is_admin,
+        login_url='/denegado/', redirect_field_name=None))
+    def dispatch(self, *args, **kwargs):
+        return super(AdminRequiredMixin, self).dispatch(*args, **kwargs)
+
+
+class HomeView(TemplateView):
+    template_name = 'home.html'
+
+
+@login_and_admin
+def dashboard(request):
+    estados = Estado.objects.all()
+    sucursales = Sucursal.objects.order_by('nombre')
+    total_handhelds = Handheld.objects.all().count()
+
+    data = {}
+    for sucursal in sucursales:
+        data[sucursal] = {}
+        for estado in estados:
+            data[sucursal][estado] = 0
+        for handheld in Handheld.objects.filter(sucursal=sucursal):
+            data[sucursal][handheld.estado] += 1
+    
+    return render(request, 'dashboard.html', {
+        'data': data,
+        'estados': estados,
+        'total_handhelds': total_handhelds,
     })
 
 
-@login_required
-def handhelds(request):
-    handhelds = Handheld.objects.order_by('fecha_ultimo_cambio')
-    return render(request, 'handhelds.html', {
-        'handhelds': handhelds,
-    })
+class IncidentesView(AdminRequiredMixin, ListView):
+    model = Incidente
+    template_name = "incidentes.html"
+    context_object_name = 'incidentes'
 
 
-@login_required
-def handheld(request, id):
-    handheld = get_object_or_404(Handheld, pk=id)
-    return render(request, 'handheld.html', {
-        'handheld': handheld,
-    })
+class IncidentesDiaView(AdminRequiredMixin, ListView):
+    model = Incidente
+    template_name = "incidentes.html"
+    context_object_name = "incidentes"
 
-
-@login_required
-def handheld_cambiar_estado(request, id):
-    handheld = get_object_or_404(Handheld, pk=id)
-    form_class = HandheldCambiarEstadoForm
-    if request.method == 'POST':
-        form = form_class(data=request.POST, instance=handheld)
-        if form.is_valid():
-            estado_anterior = handheld.estado
-            form.save()
-            nuevo_registro_historico = HandheldCambioEstado()
-            nuevo_registro_historico.handheld = handheld
-            nuevo_registro_historico.estado_anterior = estado_anterior
-            nuevo_registro_historico.nuevo_estado = form.cleaned_data['estado']
-            nuevo_registro_historico.observacion = form.cleaned_data['observacion']
-            nuevo_registro_historico.save()
-            return redirect('handheld', id=handheld.id)
-    else:
-        form = form_class(instance=handheld)
-    return render(request, 'handheld_cambiar_estado.html', {
-        'handheld': handheld,
-        'form': form,
-    })
-
-
-@login_required
-def handheld_cambiar_vendedor(request, id):
-    handheld = get_object_or_404(Handheld, pk=id)
-    vendedor_actual = Vendedor.objects.filter(handheld=handheld)
-    form_class = HandheldCambiarVendedorForm
-    if request.method == 'POST':
-        form = form_class(request.POST)
-        if form.is_valid():
-            vendedor_nuevo = form.cleaned_data['vendedor']
-            if vendedor_actual:
-                vendedor_actual[0].handheld = None
-                vendedor_actual[0].save()
-            vendedor_nuevo.handheld = handheld
-            vendedor_nuevo.save()
-            return redirect('handheld', id=handheld.id)
-    else:
-        form = form_class
-    return render(request, 'handheld_cambiar_vendedor.html', {
-        'handheld': handheld,
-        'form': form,
-    })
-
-
-@login_required
-def handheld_cargar_incidente(request, id):
-    handheld = get_object_or_404(Handheld, pk=id)
-    form_class = DispositivoCargarIncidenteForm
-    if request.method == 'POST':
-        form = form_class(request.POST)
-        if form.is_valid():
-            incidente = form.save(commit=False)
-            incidente.user = request.user
-            incidente.handheld = handheld
-            incidente.save()
-            return redirect('incidente', id=incidente.id)
-    else:
-        form = form_class()
-    return render(request, 'handheld_cargar_incidente.html', {
-        'form': form,
-        'handheld': handheld,
-    })
-
-
-@login_required
-def vendedores(request):
-    vendedores = Vendedor.objects.order_by('legajo')
-    return render(request, 'vendedores.html', {
-        'vendedores': vendedores,
-    })
-
-
-@login_required
-def vendedor(request, id):
-    vendedor = get_object_or_404(Vendedor, pk=id)
-    return render(request, 'vendedor.html', {
-        'vendedor': vendedor,
-    })
-
-
-@login_required
-def incidentes(request):
-    incidentes = Incidente.objects.order_by('fecha_carga')
-    return render(request, 'incidentes.html', {
-        'incidentes': incidentes,
-    })
-
-
-@login_required
-def incidente(request, id):
-    incidente = Incidente.objects.get(id=id)
-    incidente = get_object_or_404(Incidente, pk=id)
-    return render(request, 'incidente.html', {
-        'incidente': incidente,
-    })
+    def get_queryset(self):
+        queryset = super(IncidentesDiaView, self).get_queryset()
+        today = datetime.now().date()
+        tomorrow = today + timedelta(1)
+        today_start = datetime.combine(today, time())
+        today_end = datetime.combine(tomorrow, time())
+        return queryset.order_by('-fecha_carga').filter(fecha_carga__gte=today_start).filter(fecha_carga__lt=today_end)
 
 
 @login_required
@@ -159,62 +99,132 @@ def cargar_incidente(request):
     })
 
 
-# def login(request):
-#     if request.method == 'POST':
-#         usuario = request.POST['username']
-#         password = request.POST['password']
-#         user = authenticate(username=usuario, password=password)
-#         if user:
-#             if user.is_active:
-#                 auth_login(request, user)
-#                 return redirect('home')
-#             else:
-#                 print ("Invalid login details: {0}, {1}".format(username, password))
-#                 return HttpResponse("Tu cuenta esta desactivada.")
-#         else:
-#             return HttpResponse("Datos suministrados invalidos.")
-#     return render(request, 'login.html')
-
-    #     form = form_class(request.POST)
-    #     print(form)
-    #     print(form.is_valid())
-    #     print(request.POST['username'])
-    #     if form.is_valid():
-    #         usuario = request.POST['username']
-    #         password = request.POST['password']
-    #         user = authenticate(username=usuario, password=password)
-    #         print(usuario, password, user)
-    #         if user:
-    #             if user.is_active:
-    #                 auth_login(request, user)
-    #                 return redirect('home')
-    #             else:
-    #                 return HttpResponse("Tu cuenta esta desactivada.")
-    #         else:
-    #             print ("Invalid login details: {0}, {1}".format(username, password))
-    #             return HttpResponse("Datos suministrados invalidos.")
-    # else:
-    #     form = form_class()
-    # return render(request, 'login.html', {
-    #     'form': form,
-    # })
-
-# @login_required
-# def logout(request):
-#     auth_logout(request)
-#     return redirect('home')
-
-
-class HandheldListView(ListView):
+class HandheldBuscarView(AdminRequiredMixin, ListView):
     model = Handheld
     template_name = "handhelds.html"
     context_object_name = "handhelds"
 
     def get_queryset(self):
-        queryset = super(HandheldListView, self).get_queryset()
-
+        queryset = super(HandheldBuscarView, self).get_queryset()
         q = self.request.GET.get("q")
         if q:
             return queryset.filter(numero_de_serie__icontains=q)
+        return queryset.order_by('numero_de_serie')
 
-        return queryset.order_by('fecha_ultimo_cambio')
+@login_and_admin
+def handheld_cambiar_estado(request, pk):
+    handheld = get_object_or_404(Handheld, pk=pk)
+    form_class = HandheldCambiarEstadoForm
+    if request.method == 'POST':
+        form = form_class(data=request.POST, instance=handheld)
+        if form.is_valid():
+            estado_anterior = handheld.estado
+            form.save()
+            nuevo_registro_historico = HandheldCambioEstado()
+            nuevo_registro_historico.handheld = handheld
+            nuevo_registro_historico.estado_anterior = estado_anterior
+            nuevo_registro_historico.nuevo_estado = form.cleaned_data['estado']
+            nuevo_registro_historico.observacion = form.cleaned_data['observacion']
+            nuevo_registro_historico.save()
+            messages.success(request, 'Se cambio el estado a la handheld.')
+            return redirect('home')
+    else:
+        form = form_class(instance=handheld)
+    return render(request, 'handheld_cambiar_estado.html', {
+        'handheld': handheld,
+        'form': form,
+    })
+
+
+@login_and_admin
+def handheld_mover_sucursal(request, pk):
+    handheld = get_object_or_404(Handheld, pk=pk)
+    form_class = HandheldMoverSucursalForm
+    if request.method == 'POST':
+        form = form_class(data=request.POST, instance=handheld)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Se movio la handheld de sucursal.')
+            return redirect('home')
+    else:
+        form = form_class(instance=handheld)
+    return render(request, 'handheld_mover_sucursal.html', {
+        'handheld': handheld,
+        'form': form,
+    })
+
+
+class VendedorBuscarView(AdminRequiredMixin, ListView):
+    model = Vendedor
+    template_name = "vendedores.html"
+    context_object_name = "vendedores"
+
+    def get_queryset(self):
+        queryset = super(VendedorBuscarView, self).get_queryset()
+        q = self.request.GET.get("q")
+        if q:
+            return queryset.filter(legajo__icontains=q)
+        return queryset.order_by('legajo')
+
+
+@login_and_admin
+def vendedor_asignar_handheld(request, pk):
+    vendedor = get_object_or_404(Vendedor, pk=pk)
+    form_class = VendedorCambiarHandheldForm
+    if request.method == 'POST':
+        form = form_class(request.POST)
+        if form.is_valid():
+            nueva_handheld = form.cleaned_data['handheld']
+            vendedor.handheld = nueva_handheld
+            vendedor.save()
+            messages.success(request, 'Se asigno la handheld al vendedor.')
+            return redirect('home')
+    else:
+        form = form_class
+    return render(request, 'vendedor_asignar_handheld.html', {
+        'vendedor': vendedor,
+        'form': form,
+    })
+
+
+@login_and_admin
+def vendedor_remover_handheld(request, pk):
+    vendedor = get_object_or_404(Vendedor, pk=pk)
+    if request.method == 'POST':
+        vendedor.handheld = None
+        vendedor.save()
+        messages.success(request, 'Se removio la handheld al vendedor.')
+        return redirect ('home')
+    else:
+        return render(request, 'vendedor_remover_handheld.html', {
+            'vendedor': vendedor,
+        })
+
+
+class ReportesView(AdminRequiredMixin, TemplateView):
+    template_name = 'reportes.html'
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = authenticate(username=request.POST['username'], password=request.POST['password'])
+            if user:
+                if user.is_active:
+                    auth_login(request, user)
+                    messages.success(request, 'Te logueaste con exito.')
+                    if request.GET.get('next'):
+                        return redirect(request.GET['next'])
+                    else:
+                        return redirect('home')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'login.html', {
+        'form': form,
+    })
+
+
+class DenegadoView(TemplateView):
+    template_name = 'denegado.html'

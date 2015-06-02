@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block titulo %}Remover Handheld - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1><u>Remover Handheld</u>: {{ vendedor.handheld }} <u>al vendedor</u>: {{ vendedor }}</h1>
+    <form role="form" action="" method="post">
+      {% csrf_token %}
+      <button type="submit">Remover</button>
+      <input type="button" value="Cancelar!" onclick="history.back(-1)">
+    </form>   
+{% endblock %}

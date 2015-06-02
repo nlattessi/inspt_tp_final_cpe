@@ -5,9 +5,8 @@ import string
 import django
 django.setup()
 from faker import Factory
-from app.models import (Estado, Vendedor, CentroDistribucion,
-                        Handheld, TipoIncidente, Incidente,
-                        ModalidadVendedor, MyUser)
+from app.models import (Estado, Vendedor, Sucursal, Handheld,
+    TipoIncidente, Incidente, ModalidadVendedor, MyUser)
 
 
 def popular():
@@ -15,7 +14,7 @@ def popular():
     crear_superuser()
     crear_usuarios()
     crear_estados()
-    crear_centros_distribucion()
+    crear_sucursales()
     agregar_handhelds()
     crear_modalidades_vendedor()
     agregar_vendedores()
@@ -47,15 +46,14 @@ def crear_estados():
         e = Estado.objects.create(nombre=estado)
 
 
-def crear_centros_distribucion():
-    print("Creando centros de distribucion...")
+def crear_sucursales():
+    print("Creando sucursales...")
     faker = Factory.create()
     sucursales = ('alvarado', 'bahia blanca', 'cordoba', 'mar del plata', 'mendoza', 'neuquen', 'posadas', 'resistencia', 'rosario', 'san juan', 'santa fe', 'tucuman')
     for sucursal in sucursales:
         codigo = ''.join(random.choice(string.digits) for _ in range(4))
         try:
-            cd = CentroDistribucion.objects.create(sucursal=sucursal,
-                                               codigo=codigo)
+            suc = Sucursal.objects.create(nombre=sucursal, codigo=codigo)
         except IntegrityError as e:
             pass
 
@@ -65,16 +63,18 @@ def agregar_handhelds():
     faker = Factory.create()
     modelos = ('palm', 'hp', 'qtek', 'htc', 'sony', 'dell' ,'intermec', 'trimble', 'honeywell', 'symbol')
     estados = Estado.objects.all()
-    centros_distribucion = CentroDistribucion.objects.all()
+    sucursales = Sucursal.objects.all()
     for i in range(0, 20):
         numero_de_serie = faker.md5()[0:11]
         modelo = faker.random_element(modelos)
         estado = faker.random_element(estados)
-        centro_distribucion = faker.random_element(centros_distribucion)
-        Handheld.objects.get_or_create(numero_de_serie=numero_de_serie,
-                                       modelo=modelo,
-                                       estado=estado,
-                                       centro_distribucion=centro_distribucion)
+        sucursal = faker.random_element(sucursales)
+        Handheld.objects.get_or_create(
+            numero_de_serie=numero_de_serie,
+            modelo=modelo,
+            estado=estado,
+            sucursal=sucursal
+        )
 
 
 def crear_modalidades_vendedor():
@@ -93,10 +93,12 @@ def agregar_vendedores():
         modalidad = faker.random_element(modalidades)
         nombre = faker.first_name()
         apellido = faker.last_name()
-        Vendedor.objects.get_or_create(legajo=legajo,
-                                       modalidad=modalidad,
-                                       nombre=nombre,
-                                       apellido=apellido)
+        Vendedor.objects.get_or_create(
+            legajo=legajo,
+            modalidad=modalidad,
+            nombre=nombre,
+            apellido=apellido
+        )
 
 
 def crear_tipos_incidente():
@@ -113,21 +115,26 @@ def agregar_incidentes():
     handhelds = Handheld.objects.all()
     vendedores = Vendedor.objects.all()
     usuarios = MyUser.objects.filter(is_admin=False)
-    #creador = User.objects.get(username='admin')
     for i in range(0, 50):
         tipo = faker.random_element(tipos)
         descripcion = faker.text()
         solucion = faker.text()
         handheld = faker.random_element(handhelds)
         vendedor = faker.random_element(vendedores)
-        #usuario = creador
         usuario = faker.random_element(usuarios)
-        Incidente.objects.get_or_create(tipo=tipo,
-                                        descripcion=descripcion,
-                                        solucion=solucion,
-                                        handheld=handheld,
-                                        vendedor=vendedor,
-                                        usuario=usuario)
+        fecha_carga = faker.date_time_between(
+            start_date="-5d",
+            end_date="now"
+        )
+        Incidente.objects.get_or_create(
+            tipo=tipo,
+            descripcion=descripcion,
+            solucion=solucion,
+            handheld=handheld,
+            vendedor=vendedor,
+            fecha_carga=fecha_carga,
+            usuario=usuario
+        )
 
 
 if __name__ == '__main__':

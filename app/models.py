@@ -2,6 +2,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
 from django.core.validators import RegexValidator
+from django.conf import settings
+
+from datetime import datetime
+from django.utils import timezone
 
 
 class MyUserManager(BaseUserManager):
@@ -74,15 +78,15 @@ class Estado(models.Model):
         return self.nombre
 
 
-class CentroDistribucion(models.Model):
-    cuatro_numeros = RegexValidator(r'[0-9]{4}$', 'Codigo debe ser 4 numeros.')
+class Sucursal(models.Model):
+    cuatro_numeros = RegexValidator(r'[0-9]{4}$', 'El codigo debe ser 4 numeros.')
 
     codigo = models.CharField(max_length=4, unique=True,
                               validators=[cuatro_numeros])
-    sucursal = models.CharField(max_length=255, blank=True)
+    nombre = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return "{}-{}".format(self.codigo, self.sucursal)
+        return "{}-{}".format(self.codigo, self.nombre)
 
 
 class Handheld(models.Model):
@@ -92,10 +96,10 @@ class Handheld(models.Model):
     numero_de_serie = models.CharField(max_length=11, unique=True,
                                        validators=[once_caracteres])
     modelo = models.CharField(max_length=255, blank=True)
-    fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
     estado = models.ForeignKey(Estado)
-    centro_distribucion = models.ForeignKey(
-        CentroDistribucion, blank=True, null=True)
+    fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
+    sucursal = models.ForeignKey(
+        Sucursal, blank=True, null=True)
 
     def get_absolute_url(self):
         return reverse('handheld', kwargs={'pk': self.pk})
@@ -151,8 +155,8 @@ class Incidente(models.Model):
     solucion = models.TextField()
     handheld = models.ForeignKey(Handheld, blank=True, null=True)
     vendedor = models.ForeignKey(Vendedor, blank=True, null=True)
-    usuario = models.ForeignKey(MyUser, blank=True, null=True)
-    fecha_carga = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    fecha_carga = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return "{}".format(self.id)

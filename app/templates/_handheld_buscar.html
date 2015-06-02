@@ -1,7 +1,4 @@
-{% comment %}
-    Usage: {% include "_handheld_search.html" %}
-{% endcomment %}
 <form action="{% url 'handheld_buscar' %}" method="GET">
-    <input type="text" name="q" />
+    <input type="text" name="q" placeholder='Numero de serie...'>
     <button type="submit">Buscar</button>
 </form>

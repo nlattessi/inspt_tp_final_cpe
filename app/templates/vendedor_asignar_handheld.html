@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block titulo %}Asignar Handheld - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1><u>Asignar Handheld al vendedor</u>: {{ vendedor }}</h1>
+    <form role="form" action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Asignar</button>
+    </form>   
+{% endblock %}

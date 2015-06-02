@@ -11,23 +11,34 @@
     <h1>CPE menu</h1>
     {% if user.is_authenticated %}
         <h2>Usuario: {{ user.username }}</h2>
-        <a href="{% url 'logout' %}">[Logout]</a>
+        <h3><a href="{% url 'logout' %}">[Logout]</a></h3>
+        <nav>
+            <ul>        
+            {% if user.is_admin %}
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'admin:index' %}">Panel de Administracion</a></li>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'incidentes_dia' %}">Ver incidentes del dia</a></li>
+                <li><a href="{% url 'handheld_buscar' %}">Buscar handheld</a></li>
+                <li><a href="{% url 'vendedor_buscar' %}">Buscar vendedor</a></li>                
+                <li><a href="{% url 'reportes' %}">Reportes</a></li>
+            {% else %}
+                <li><a href="{% url 'cargar_incidente' %}">Cargar incidente</a></li>
+            {% endif %}
+            </ul>
+        </nav>
     {% else %}
-        <h2><a href="{% url 'login' %}">[Login]</a></h2>
-    {% endif %}
-    <nav>
-        <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'handhelds' %}">Handhelds</a></li>
-            <li><a href="{% url 'centros_distribucion' %}">Centros de distribucion</a></li>
-            <li><a href="{% url 'vendedores' %}">Vendedores</a></li>
-            <li><a href="{% url 'incidentes' %}">Incidentes</a></li>
-            <li><a href="{% url 'cargar_incidente' %}">Cargar incidente</a></li>
-            <li><a href="{% url 'home' %}">Generar reporte</a></li>
-        </ul>
-    </nav>
+        <h3><a href="{% url 'login' %}">[Login]</a></h3>
+    {% endif %}    
 </header>
 <hr>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 {% block contenido %}{% endblock %}
 </body>
 </html>
