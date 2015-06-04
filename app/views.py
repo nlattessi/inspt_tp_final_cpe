@@ -91,7 +91,7 @@ def cargar_incidente(request):
             incidente = form.save(commit=False)
             incidente.user = request.user
             incidente.save()
-            return redirect('incidente', id=incidente.id)
+            return redirect('home')
     else:
         form = form_class()
     return render(request, 'cargar_incidente.html', {
