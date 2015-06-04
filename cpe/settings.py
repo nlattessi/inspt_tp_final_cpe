@@ -102,10 +102,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
-#FAKER_LOCALE = None     # settings.LANGUAGE_CODE is loaded
-#FAKER_PROVIDERS = None  # faker.DEFAULT_PROVIDERS is loaded (all)
+STATIC_ROOT = 'staticfiles'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
 
 # Custom Auth Model
