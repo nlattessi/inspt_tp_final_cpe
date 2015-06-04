@@ -10,7 +10,7 @@ from app.models import (Estado, Vendedor, Sucursal, Handheld,
 
 
 def popular():
-    flush_base()
+    #flush_base()
     crear_superuser()
     crear_usuarios()
     crear_estados()
