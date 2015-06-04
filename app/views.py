@@ -91,6 +91,7 @@ def cargar_incidente(request):
             incidente = form.save(commit=False)
             incidente.user = request.user
             incidente.save()
+            messages.success(request, 'Se cargo el incidente.')
             return redirect('home')
     else:
         form = form_class()

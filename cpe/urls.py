@@ -11,7 +11,7 @@ urlpatterns = [
 
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
 
-    url(r'^incidentes/$', views.IncidentesView.as_view()),
+    url(r'^incidentes/$', views.IncidentesView.as_view(), name='incidentes'),
 
     url(r'^incidentes_dia/$', views.IncidentesDiaView.as_view(),
         name='incidentes_dia'),
