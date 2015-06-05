@@ -10,7 +10,7 @@ from app.models import (Estado, Vendedor, Sucursal, Handheld,
 
 
 def popular():
-    #flush_base()
+    flush_base()
     crear_superuser()
     crear_usuarios()
     crear_estados()
@@ -24,7 +24,8 @@ def popular():
 
 def flush_base():
     print("Limpiando la base actual...")
-    os.system("/home/nahuel/Code/inspt_tp_final_cpe/manage.py flush --noinput --no-initial-data")
+    #os.system("/home/nahuel/Code/inspt_tp_final_cpe/manage.py flush --noinput --no-initial-data")
+    os.system("./manage.py flush --noinput --no-initial-data")
 
 def crear_superuser():
     print("Creando superuser...")
