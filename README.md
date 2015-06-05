@@ -24,7 +24,7 @@ El sistema, en su operatoria diaria, será usado por 2 tipos de usuarios distint
 
 **Modelo de datos**
 
-Datos maestros:
+__Datos maestros:__
 
 * Usuarios
 
