@@ -46,6 +46,9 @@ def dashboard(request):
     estados = Estado.objects.all()
     sucursales = Sucursal.objects.order_by('nombre')
     total_handhelds = Handheld.objects.all().count()
+    handhelds_robadas = Handheld.objects.filter(estado__nombre='robo').count()
+    handhelds_fuera_de_servicio = Handheld.objects.filter(estado__nombre='fuera de servicio').count()
+    disponible_handhelds = total_handhelds - handhelds_robadas - handhelds_fuera_de_servicio
 
     data = {}
     for sucursal in sucursales:
@@ -59,6 +62,7 @@ def dashboard(request):
         'data': data,
         'estados': estados,
         'total_handhelds': total_handhelds,
+        'disponible_handhelds': disponible_handhelds,
     })
 
 

@@ -42,8 +42,6 @@ urlpatterns = [
         name='vendedor_remover_handheld'
     ),
 
-    url(r'^reportes/$', views.ReportesView.as_view(), name='reportes'),
-
     url(r'^accounts/login/$', views.login_view, name='login'),
 
     url(r'^accounts/logout/$',
