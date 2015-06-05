@@ -152,3 +152,18 @@ Volumen de uso diario actual aproximada:
 
 * Repositorio Github: [https://github.com/nlattessi/inspt_tp_final_cpe](https://github.com/nlattessi/inspt_tp_final_cpe)
 * Sistema online (Heroku): [https://nlattessi-cpe.herokuapp.com/](https://nlattessi-cpe.herokuapp.com/)
+
+<br>
+
+**Credenciales de prueba**
+
+* Admin
+	    
+	    Username = admin
+	    Password = admin
+    
+* De incidentes
+	    
+	    Username = demo
+	    Password = demo
+    
