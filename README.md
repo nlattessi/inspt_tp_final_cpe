@@ -143,6 +143,7 @@ Volumen de uso diario actual aproximada:
 
 **Posibles extensiones al sistema**
 
+* Implementación de un diseño visual.
 * Generación de reportes.
 * Revisión del historial de cambio de estados.
 
