@@ -157,6 +157,7 @@ class Incidente(models.Model):
     vendedor = models.ForeignKey(Vendedor, blank=True, null=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     fecha_carga = models.DateTimeField(default=timezone.now)
+    revisado = models.BooleanField(default=False)
 
     def __str__(self):
         return "{}".format(self.id)

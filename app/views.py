@@ -7,6 +7,7 @@ from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from app.models import (Handheld, Vendedor, Incidente, Sucursal,
@@ -14,7 +15,7 @@ from app.models import (Handheld, Vendedor, Incidente, Sucursal,
 from app.forms import (HandheldCambiarEstadoForm,
                        HandheldMoverSucursalForm,
                        IncidenteCargarForm,
-                       VendedorCambiarHandheldForm)
+                       VendedorCambiarHandheldForm, LoginForm)
 
 
 def login_and_admin(view_func):
@@ -36,8 +37,14 @@ class AdminRequiredMixin(object):
     def dispatch(self, *args, **kwargs):
         return super(AdminRequiredMixin, self).dispatch(*args, **kwargs)
 
+class LoginRequiredMixin(object):
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
+        return login_required(view)
 
-class HomeView(TemplateView):
+
+class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
 
 
@@ -57,12 +64,15 @@ def dashboard(request):
             data[sucursal][estado] = 0
         for handheld in Handheld.objects.filter(sucursal=sucursal):
             data[sucursal][handheld.estado] += 1
-    
+
+    incidentes_sin_revisar = Incidente.objects.filter(revisado=False)
+
     return render(request, 'dashboard.html', {
         'data': data,
         'estados': estados,
         'total_handhelds': total_handhelds,
         'disponible_handhelds': disponible_handhelds,
+        'incidentes_sin_revisar': incidentes_sin_revisar,
     })
 
 
@@ -212,24 +222,29 @@ class ReportesView(AdminRequiredMixin, TemplateView):
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
+        form = LoginForm(data=request.POST)
         if form.is_valid():
-            user = authenticate(username=request.POST['username'], password=request.POST['password'])
+            user = form.login(request)
             if user:
                 if user.is_active:
                     auth_login(request, user)
-                    messages.success(request, 'Te logueaste con exito.')
+                    messages.success(request, 'Ingresaste con exito.')
                     if request.GET.get('next'):
                         return redirect(request.GET['next'])
                     else:
                         return redirect('home')
     else:
-        form = AuthenticationForm()
-    
+        form = LoginForm()
+
     return render(request, 'login.html', {
         'form': form,
     })
 
+@login_required
+def logout_view(request):
+    auth_logout(request)
+    messages.success(request, 'Saliste con exito.')
+    return redirect('login')
 
 class DenegadoView(TemplateView):
     template_name = 'denegado.html'

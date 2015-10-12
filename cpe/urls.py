@@ -44,11 +44,12 @@ urlpatterns = [
 
     url(r'^accounts/login/$', views.login_view, name='login'),
 
-    url(r'^accounts/logout/$',
-        'django.contrib.auth.views.logout',
-        kwargs={'next_page': 'home'},
-        name='logout',
-    ),
+    # url(r'^accounts/logout/$',
+    #     'django.contrib.auth.views.logout',
+    #     kwargs={'next_page': 'home', 'message':'Saliste'},
+    #     name='logout',
+    # ),
+    url(r'^accounts/logout/$', views.logout_view, name='logout'),
 
     url(r'^denegado/$', views.DenegadoView.as_view(), name='denegado'),
 ]
