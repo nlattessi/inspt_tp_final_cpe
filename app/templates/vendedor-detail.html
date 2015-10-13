@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+
+{% load staticfiles %}
+
 {% block titulo %}Detalle Vendedor - {{ block.super }}{% endblock %}
 {% block contenido %}
 <div class="row">
@@ -26,8 +29,8 @@
             <span class="label label-primary">{{ vendedor.modalidad }}</span>
           </li>
           <li class="list-group-item">
-            {% if vendedor.handheld %}
             <span class="label label-default">Handheld asignada:</span>
+            {% if vendedor.handheld %}
             <a href="{% url 'handheld_detail' pk=vendedor.handheld.pk %}"><span class="label label-primary">{{ vendedor.handheld }}</span></a>
             {% else %}
             <span class="label label-default"><span>---</span>
@@ -36,13 +39,24 @@
         </ul>
       </div>
       <div class="panel-footer">
-        <a href="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}" class="btn btn-xs btn-default">Asignar nueva handheld</a>
+        <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#asignarModal" data-vendedor="{{ vendedor }}" data-vendedor-asignar-url="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Asignar nueva handheld</button>
         {% if vendedor.handheld %}
-          <a href="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}" class="btn btn-xs btn-primary">Remover handheld asignada</a>
+          <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#removerModal" data-vendedor="{{ vendedor }}" data-vendedor-remover-url="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Remover handheld asignada</button>
         {% endif %}
-        <a href="{% url 'vendedor_buscar' %}" class="btn btn-xs btn-info pull-right">Volver</a>
+        <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
       </div>
     </div>
   </div>
 </div>
+
+<!-- asignarModal -->
+{% include "_asignar_handheld_modal.html" %}
+<!-- removerModal -->
+{% include "_remover_handheld_modal.html" %}
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'js/asignar_handheld_modal.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/remover_handheld_modal.js' %}"></script>
 {% endblock %}

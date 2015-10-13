@@ -43,8 +43,10 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Incidentes <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-                <li><a href="{% url 'incidentes_dia' %}">Ver incidentes del dia</a></li>
+                <li><a href="{% url 'incidentes_dia' %}">Ver incidentes de hoy</a></li>
                 <li><a href="{% url 'incidentes' %}">Ver todos los incidentes</a></li>
+                <li class="divider"></li>
+                <li><a href="{% url 'cargar_incidente' %}">Cargar incidente</a></li>
               </ul>
             </li>
             <li><a href="{% url 'admin:index' %}">Panel de Administracion</a></li>
@@ -86,5 +88,6 @@
 </div>
 <script type="text/javascript" src="{% static 'lib/jquery-2.1.4.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/bootstrap.min.js' %}"></script>
+{% block javascript %}{% endblock %}
 </body>
 </html>

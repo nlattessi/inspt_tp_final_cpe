@@ -4,7 +4,7 @@
 <div class="row">
   <div class="col-md-12">
     <ul class="breadcrumb">
-      <li class="active">Incidentes</li>
+      <li class="active">{{ titulo }}</li>
     </ul>
   </div>
 </div>
@@ -31,12 +31,12 @@
           <td>{{ incidente.descripcion|truncatechars:40 }}</td>
           <td>{{ incidente.tipo }}</td>
           {% if incidente.handheld %}
-            <td>{{ incidente.handheld }}</td>
+            <td><a href="{% url 'handheld_detail' pk=incidente.handheld.pk %}">{{ incidente.handheld }}</a></td>
           {% else %}
             <td>---</td>
           {% endif %}
           {% if incidente.vendedor %}
-            <td>{{ incidente.vendedor }}</td>
+            <td><a href="{% url 'vendedor_detail' pk=incidente.vendedor.pk %}">{{ incidente.vendedor }}</a></td>
           {% else %}
             <td>---</td>
           {% endif %}

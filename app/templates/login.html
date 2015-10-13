@@ -3,7 +3,9 @@
 {% block contenido %}
 <div class="col-md-6 col-md-offset-3">
   <div class="panel panel-default">
-    <div class="panel-heading"><h3 class="panel-title"><strong>Ingresar al sistema</strong></h3></div>
+    <div class="panel-heading">
+      <h3 class="panel-title"><strong>Ingresar al sistema</strong></h3>
+    </div>
     <div class="panel-body">
 
       {% if form.non_field_errors %}
@@ -32,7 +34,7 @@
             {{ field.label_tag }}
             {{ field }}
           </div>
-        {% endif %}
+          {% endif %}
         {% endfor %}
         <button type="submit" class="btn btn-sm btn-default">Entrar</button>
         <input type="hidden" name="next" value="{{ next }}" />

@@ -164,7 +164,7 @@ class TipoIncidente(models.Model):
 class Incidente(AdminURLMixin, models.Model):
     tipo = models.ForeignKey(TipoIncidente, related_name='tipo_incidente')
     descripcion = models.TextField()
-    solucion = models.TextField()
+    acciones = models.TextField(blank=True, null=True)
     handheld = models.ForeignKey(Handheld, blank=True, null=True)
     vendedor = models.ForeignKey(Vendedor, blank=True, null=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)

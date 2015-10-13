@@ -30,17 +30,17 @@
             <span class="label label-primary">{{ handheld.fecha_ultimo_cambio|date:"d/m/Y" }}</span>
           </li>
           <li class="list-group-item">
-            {% if handheld.vendedor %}
             <span class="label label-default">Asignada al vendedor:</span>
+            {% if handheld.vendedor %}
             <a href="{% url 'vendedor_detail' pk=handheld.vendedor.pk %}"><span class="label label-primary">{{ handheld.vendedor }}</span></a>
             {% else %}
-            <span class="label label-default"><span>---</span>
+            <span class="label label-primary"><span>---</span>
             {% endif %}
           </li>
 
           <li class="list-group-item">
-            {% if handheld.sucursal %}
             <span class="label label-default">Asignada a la sucursal:</span>
+            {% if handheld.sucursal %}
             <span class="label label-primary">{{ handheld.sucursal }}</span>
             {% else %}
             <span class="label label-default"><span>---</span>
@@ -51,7 +51,7 @@
       <div class="panel-footer">
         <a href="{% url 'handheld_cambiar_estado' pk=handheld.pk %}" class="btn btn-xs btn-default">Cambiar estado</a>
         <a href="{% url 'handheld_mover_sucursal' pk=handheld.pk %}" class="btn btn-xs btn-primary">Mover de sucursal</a>
-        <a href="{% url 'handheld_buscar' %}" class="btn btn-xs btn-info pull-right">Volver</a>
+        <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
       </div>
     </div>
   </div>

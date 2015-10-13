@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
-from .models import (MyUser, Handheld, Incidente)
+from .models import (MyUser, Handheld, Incidente, TipoIncidente)
 
 
 class UserCreationForm(forms.ModelForm):
@@ -64,22 +64,35 @@ class VendedorCambiarHandheldForm(forms.Form):
 
 
 class IncidenteCargarForm(forms.ModelForm):
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}),
+        error_messages={'required': 'Este campo es requerido'},
+    )
+    acciones = forms.CharField(label='Acciones realizadas',
+        widget=forms.Textarea(attrs={'rows': 3}),
+        required=False,
+    )
+
     class Meta:
         model = Incidente
-        exclude = ['usuario', 'fecha_carga']
+        exclude = ['usuario', 'fecha_carga', 'revisado']
+        error_messages = {
+            'tipo': {
+                'required': 'Este campo es requerido',
+            },
+        }
 
 
 class LoginForm(forms.Form):
     username = forms.CharField(label='Nombre de usuario',
-                                required=True,
-                                widget=forms.TextInput(attrs={'placeholder': 'Ingrese  su nombre de usuario', 'class': 'form-control'}),
-                                error_messages={'required': 'Este campo es requerido'}
-                                )
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Ingrese  su nombre de usuario', 'class': 'form-control'}),
+        error_messages={'required': 'Este campo es requerido'}
+    )
 
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Ingrese su password', 'class': 'form-control'}),
-                                required=True,
-                                error_messages={'required': 'Este campo es requerido'}
-                                )
+        required=True,
+        error_messages={'required': 'Este campo es requerido'}
+    )
 
     def clean(self):
         username = self.cleaned_data.get('username')

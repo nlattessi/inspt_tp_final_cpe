@@ -21,11 +21,11 @@
       <div class="panel-body">
         <ul class="list-group">
           <li class="list-group-item">
-            <span class="label label-default">Tipo</span>
+            <span class="label label-default">Tipo:</span>
             <span class="label label-primary">{{ incidente.tipo }}</span>
           </li>
           <li class="list-group-item">
-            <span class="label label-default">Handheld</span>
+            <span class="label label-default">Handheld:</span>
             {% if incidente.handheld %}
               <span class="label label-primary">{{ incidente.handheld }}</span>
             {% else %}
@@ -33,7 +33,7 @@
             {% endif %}
           </li>
           <li class="list-group-item">
-            <span class="label label-default">Vendedor</span>
+            <span class="label label-default">Vendedor:</span>
             {% if incidente.vendedor %}
               <span class="label label-primary">{{ incidente.vendedor }}</span>
             {% else %}
@@ -41,7 +41,7 @@
             {% endif %}
           </li>
           <li class="list-group-item">
-            <span class="label label-default">Creado por</span>
+            <span class="label label-default">Creado por:</span>
             {% if incidente.usuario %}
               <span class="label label-primary">{{ incidente.usuario }}</span>
             {% else %}
@@ -49,7 +49,7 @@
             {% endif %}
           </li>
           <li class="list-group-item">
-            <span class="label label-default">Fecha</span>
+            <span class="label label-default">Fecha:</span>
             <span class="label label-primary">{{ incidente.fecha_carga|date:'d/m/Y' }}</span>
           </li>
           <li class="list-group-item">
@@ -68,9 +68,9 @@
           </div>
         </div>
         <div class="panel panel-success">
-          <div class="panel-heading">Solucion</div>
+          <div class="panel-heading">Acciones realizadas</div>
           <div class="panel-body">
-            {{ incidente.solucion }}
+            {{ incidente.acciones }}
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-xs btn-success">Marcar como revisado</button>
             <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-primary">Editar en Panel de Administracion</a>
-            <a href="{% url 'incidentes' %}" class="btn btn-xs btn-info pull-right">Volver</a>
+            <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
           </form>
         {% endif %}
       </div>

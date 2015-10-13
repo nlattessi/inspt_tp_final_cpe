@@ -78,7 +78,7 @@ class TipoIncidenteAdmin(admin.ModelAdmin):
 
 class IncidenteAdmin(admin.ModelAdmin):
     model = Estado
-    list_display = ('id', 'tipo', 'descripcion', 'solucion', 'handheld', 'vendedor', 'usuario', 'fecha_carga')
+    list_display = ('id', 'tipo', 'descripcion', 'acciones', 'handheld', 'vendedor', 'usuario', 'fecha_carga')
     search_fields = ['id', 'tipo__nombre', 'descripcion', 'solucion', 'handheld__numero_de_serie', 'vendedor__legajo', 'usuario__username']
     ordering = ('-fecha_carga',)
     list_filter = ('tipo', 'usuario',)
