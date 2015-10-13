@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block titulo %}Handhelds - {{ block.super }}{% endblock %}
+{% block contenido %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li class="active">Handhelds</li>
+    </ul>
+  </div>
+</div>
+
+
+
+
+    <h1>Lista Handhelds</h1>
+    {% include "_handheld_buscar.html" %}
+    {% for handheld in handhelds %}
+        <h3><u>Numero de serie</u>: {{ handheld.numero_de_serie }}</h3>
+        <p><u>Modelo</u>: {{ handheld.modelo }}</p>
+        <p><u>Estado</u>: {{ handheld.estado }}</p>
+        <p><u>Fecha del ultimo cambio</u>: {{ handheld.fecha_ultimo_cambio }}</p>
+        {% if handheld.vendedor %}
+            <p><u>Asignada a</u>: {{ handheld.vendedor }}</p>
+        {% else %}
+            <p><u>Sin asignar a ningun vendedor</u></p>
+        {% endif %}
+        {% if handheld.sucursal %}
+            <p><u>Se encuentra en la sucursal</u>: {{ handheld.sucursal }}</p>
+        {% else %}
+            <p><u>No se encuentra en ninguna sucursal</u></p>
+        {% endif %}
+            <p>
+                <a href="{% url 'handheld_cambiar_estado' pk=handheld.pk %}">
+                    <button>Cambiar estado</button>
+                </a>
+            </p>
+            <p>
+                <a href="{% url 'handheld_mover_sucursal' pk=handheld.pk %}">
+                    <button>Mover de sucursal</button>
+                </a>
+            </p>
+    {% empty %}
+        <h3><b>No se encuentran handhelds</b></h3>
+    {% endfor %}
+{% endblock %}

@@ -1,15 +1,18 @@
 from functools import wraps
 from datetime import datetime, timedelta, time
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
+from django.db.models import Q
+
 from app.models import (Handheld, Vendedor, Incidente, Sucursal,
                         HandheldCambioEstado, Estado)
 from app.forms import (HandheldCambiarEstadoForm,
@@ -76,13 +79,16 @@ def dashboard(request):
     })
 
 
-class IncidentesView(AdminRequiredMixin, ListView):
+class IncidenteView(AdminRequiredMixin, ListView):
     model = Incidente
     template_name = "incidentes.html"
     context_object_name = 'incidentes'
 
+    def get_queryset(self):
+        queryset = super(IncidenteView, self).get_queryset()
+        return queryset.order_by('-fecha_carga')
 
-class IncidentesDiaView(AdminRequiredMixin, ListView):
+class IncidenteDiaView(AdminRequiredMixin, ListView):
     model = Incidente
     template_name = "incidentes.html"
     context_object_name = "incidentes"
@@ -95,6 +101,10 @@ class IncidentesDiaView(AdminRequiredMixin, ListView):
         today_end = datetime.combine(tomorrow, time())
         return queryset.order_by('-fecha_carga').filter(fecha_carga__gte=today_start).filter(fecha_carga__lt=today_end)
 
+class IncidenteDetailView(AdminRequiredMixin, DetailView):
+    model = Incidente
+    template_name = "incidente-detail.html"
+    context_object_name = "incidente"
 
 @login_required
 def cargar_incidente(request):
@@ -113,6 +123,15 @@ def cargar_incidente(request):
         'form': form,
     })
 
+@login_and_admin
+def revisar_incidente(request, pk):
+    incidente = get_object_or_404(Incidente, pk=pk)
+    if request.method == 'POST':
+        incidente.revisado = True
+        incidente.save()
+        messages.success(request, 'El incidente fue marcado como revisado.')
+    return redirect ('incidente_detail', pk=incidente.pk)
+
 
 class HandheldBuscarView(AdminRequiredMixin, ListView):
     model = Handheld
@@ -125,6 +144,17 @@ class HandheldBuscarView(AdminRequiredMixin, ListView):
         if q:
             return queryset.filter(numero_de_serie__icontains=q)
         return queryset.order_by('numero_de_serie')
+
+    def get_context_data(self, **kwargs):
+        context = super(HandheldBuscarView, self).get_context_data(**kwargs)
+        if self.request.GET.get('q'):
+            context['q'] = self.request.GET.get('q')
+        return context
+
+class HandheldDetailView(AdminRequiredMixin, DetailView):
+    model = Handheld
+    template_name = "handheld-detail.html"
+    context_object_name = "handheld"
 
 @login_and_admin
 def handheld_cambiar_estado(request, pk):
@@ -149,7 +179,6 @@ def handheld_cambiar_estado(request, pk):
         'handheld': handheld,
         'form': form,
     })
-
 
 @login_and_admin
 def handheld_mover_sucursal(request, pk):
@@ -178,9 +207,19 @@ class VendedorBuscarView(AdminRequiredMixin, ListView):
         queryset = super(VendedorBuscarView, self).get_queryset()
         q = self.request.GET.get("q")
         if q:
-            return queryset.filter(legajo__icontains=q)
+            return queryset.filter(Q(legajo__icontains=q) | Q(nombre__icontains=q) | Q(apellido__icontains=q))
         return queryset.order_by('legajo')
 
+    def get_context_data(self, **kwargs):
+        context = super(VendedorBuscarView, self).get_context_data(**kwargs)
+        if self.request.GET.get('q'):
+            context['q'] = self.request.GET.get('q')
+        return context
+
+class VendedorDetailView(AdminRequiredMixin, DetailView):
+    model = Vendedor
+    template_name = "vendedor-detail.html"
+    context_object_name = "vendedor"
 
 @login_and_admin
 def vendedor_asignar_handheld(request, pk):
@@ -200,7 +239,6 @@ def vendedor_asignar_handheld(request, pk):
         'vendedor': vendedor,
         'form': form,
     })
-
 
 @login_and_admin
 def vendedor_remover_handheld(request, pk):

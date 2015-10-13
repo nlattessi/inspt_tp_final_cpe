@@ -7,6 +7,18 @@ from django.conf import settings
 from datetime import datetime
 from django.utils import timezone
 
+from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
+class AdminURLMixin(object):
+    def get_admin_url(self):
+        content_type = ContentType \
+            .objects \
+            .get_for_model(self.__class__)
+        return reverse("admin:%s_%s_change" % (
+            content_type.app_label,
+            content_type.model),
+            args=(self.id,))
+
 
 class MyUserManager(BaseUserManager):
     def create_user(self, username, password=None):
@@ -149,7 +161,7 @@ class TipoIncidente(models.Model):
         return self.nombre
 
 
-class Incidente(models.Model):
+class Incidente(AdminURLMixin, models.Model):
     tipo = models.ForeignKey(TipoIncidente, related_name='tipo_incidente')
     descripcion = models.TextField()
     solucion = models.TextField()

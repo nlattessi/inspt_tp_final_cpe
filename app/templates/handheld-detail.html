@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block titulo %}Detalle Handheld - {{ block.super }}{% endblock %}
+{% block contenido %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li class="active">Detalle Handheld</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Numero de serie</u>: {{ handheld.numero_de_serie }}</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <span class="label label-default">Modelo:</span>
+            <span class="label label-primary">{{ handheld.modelo }}</span>
+          </li>
+          <li class="list-group-item">
+            <span class="label label-default">Estado:</span>
+            <span class="label label-primary">{{ handheld.estado }}</span>
+          </li>
+          <li class="list-group-item">
+            <span class="label label-default">Fecha del ultimo cambio:</span>
+            <span class="label label-primary">{{ handheld.fecha_ultimo_cambio|date:"d/m/Y" }}</span>
+          </li>
+          <li class="list-group-item">
+            {% if handheld.vendedor %}
+            <span class="label label-default">Asignada al vendedor:</span>
+            <a href="{% url 'vendedor_detail' pk=handheld.vendedor.pk %}"><span class="label label-primary">{{ handheld.vendedor }}</span></a>
+            {% else %}
+            <span class="label label-default"><span>---</span>
+            {% endif %}
+          </li>
+
+          <li class="list-group-item">
+            {% if handheld.sucursal %}
+            <span class="label label-default">Asignada a la sucursal:</span>
+            <span class="label label-primary">{{ handheld.sucursal }}</span>
+            {% else %}
+            <span class="label label-default"><span>---</span>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+      <div class="panel-footer">
+        <a href="{% url 'handheld_cambiar_estado' pk=handheld.pk %}" class="btn btn-xs btn-default">Cambiar estado</a>
+        <a href="{% url 'handheld_mover_sucursal' pk=handheld.pk %}" class="btn btn-xs btn-primary">Mover de sucursal</a>
+        <a href="{% url 'handheld_buscar' %}" class="btn btn-xs btn-info pull-right">Volver</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block titulo %}Vendedores - {{ block.super }}{% endblock %}
+{% block contenido %}
+    <h1>Lista Vendedores</h1>
+    {% include "_vendedor_buscar.html" %}
+    {% for vendedor in vendedores %}
+        <h3><u>Legajo</u>: {{ vendedor.legajo }}</h3>
+        <p><u>Modalidad</u>: {{ vendedor.modalidad }}</p>
+        <p><u>Nombre</u>: {{ vendedor.nombre }} {{ vendedor.apellido }}</p>
+        {% if vendedor.handheld %}
+            <p><u>Handheld asignada</u>: {{ vendedor.handheld.numero_de_serie }}</p>
+        {% else %}
+            <p><u>Sin asignar handheld</u></p>
+        {% endif %}
+        <p>
+            <a href="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}">
+                <button>Asignar nueva handheld</button>
+            </a>
+        </p>
+        {% if vendedor.handheld %}
+            <p>
+                <a href="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}">
+                    <button>Remover handheld asignada</button>
+                </a>
+            </p>
+        {% endif %}
+    {% empty %}
+        <h3><b>No se encuentran vendedores</b></h3>
+    {% endfor %}
+{% endblock %}
