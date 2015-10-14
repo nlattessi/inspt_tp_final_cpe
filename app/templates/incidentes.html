@@ -1,39 +1,64 @@
 {% extends 'base.html' %}
 {% block titulo %}Incidentes - {{ block.super }}{% endblock %}
 {% block contenido %}
-    <h1>Lista Incidentes</h1>
-    {% for incidente in incidentes %}
-        <h3><u>ID</u>: {{ incidente.pk }}</h3>
-        <p><u>Tipo</u>: {{ incidente.tipo }}</p>
-        <p><u>Descripcion</u>: {{ incidente.descripcion }}</p>
-        <p><u>Solucion</u>: {{ incidente.solucion }}</p>
-        {% if incidente.handheld %}
-            <p>
-                <u>Handheld relacionada</u>: {{ incidente.handheld.numero_de_serie }}
-                <a href="{% url 'handheld_cambiar_estado' pk=incidente.handheld.pk %}">
-                    <button href="{% url 'handheld_cambiar_estado' pk=incidente.handheld.pk %}">Cambiar estado</button>
-                </a>
-                <a href="{% url 'handheld_mover_sucursal' pk=incidente.handheld.pk %}">
-                    <button>Mover de sucursal</button>
-                </a>
-            </p>
-        {% endif %}
-        {% if incidente.vendedor %}
-            <p>
-                <u>Vendedor relacionado</u>: {{ incidente.vendedor }}
-                <a href="{% url 'vendedor_asignar_handheld' pk=incidente.vendedor.pk %}">
-                    <button>Asignar nueva handheld</button>
-                </a>
-                {% if incidente.vendedor.handheld %}
-                    <a href="{% url 'vendedor_remover_handheld' pk=incidente.vendedor.pk %}">
-                        <button>Remover handheld asignada</button>
-                    </a>
-                {% endif %}
-            </p>
-        {% endif %}
-        {% if incidente.usuario %}
-            <p><u>Creado por</u>: {{ incidente.usuario }}</p>
-        {% endif %}
-        <p><u>Fecha de carga</u>: {{ incidente.fecha_carga }}</p>
-    {% endfor %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li class="active">{{ titulo }}{% if usuario %} <b>{{ usuario }}</b>{% endif %}</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Descripcion</th>
+          <th>Tipo</th>
+          <th>Handheld</th>
+          <th>Vendedor</th>
+          <th>Creado por</th>
+          <th>Fecha</th>
+          <th>Revisado?</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for incidente in incidentes %}
+        <tr>
+          <td><a href="{% url 'incidente_detail' pk=incidente.pk %}">{{ incidente.pk }}</a></td>
+          <td>{{ incidente.descripcion|truncatechars:40 }}</td>
+          <td>{{ incidente.tipo }}</td>
+          {% if incidente.handheld %}
+            <td><a href="{% url 'handheld_detail' pk=incidente.handheld.pk %}">{{ incidente.handheld }}</a></td>
+          {% else %}
+            <td>---</td>
+          {% endif %}
+          {% if incidente.vendedor %}
+            <td><a href="{% url 'vendedor_detail' pk=incidente.vendedor.pk %}">{{ incidente.vendedor }}</a></td>
+          {% else %}
+            <td>---</td>
+          {% endif %}
+          {% if incidente.usuario %}
+            <td>{{ incidente.usuario }}</td>
+          {% else %}
+            <td>---</td>
+          {% endif %}
+          <td>{{ incidente.fecha_carga|date:'d/m/Y' }}</td>
+          {% if incidente.revisado %}
+          <td>
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          </td>
+          {% else %}
+          <td>
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

@@ -24,7 +24,6 @@ def popular():
 
 def flush_base():
     print("Limpiando la base actual...")
-    #os.system("/home/nahuel/Code/inspt_tp_final_cpe/manage.py flush --noinput --no-initial-data")
     os.system("./manage.py flush --noinput --no-initial-data")
 
 def crear_superuser():

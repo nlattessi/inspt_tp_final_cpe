@@ -1,27 +1,64 @@
 {% extends 'base.html' %}
 {% block titulo %}Dashboard - {{ block.super }}{% endblock %}
 {% block contenido %}
-    <h1>Dashboard</h1>
-    <table>
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li class="active">Dashboard</li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-8">
+    <div class="well">
+      Stock Handhelds
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="well">
+      Ultimos Incidentes sin revisar (Total: <a href="{% url 'incidentes_sin_revisar' %}">{{ total_incidentes_sin_revisar}}</a>)
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-8">
+    <table class="table table-striped table-hover">
+      <thead>
         <tr>
-            <th>Sucursal</th>
-            {% for estado in estados %}
-                <th>{{ estado.nombre }}</th>
-            {% endfor %}
+          <th>Sucursal</th>
+          {% for estado in estados %}
+              <th>{{ estado.nombre|title }}</th>
+          {% endfor %}
         </tr>
+      </thead>
+      <tbody>
         {% for sucursal, estados in data.items %}
-            <tr>
-                <td>{{ sucursal.nombre }}</td>
-                {% for estado, cant in estados.items %}
-                    <td>{{ cant }}</td>
-                {% endfor %}
-            </tr>
+          <tr>
+            <td>{{ sucursal.nombre|title }}</td>
+            {% for estado, cant in estados.items %}
+              <td>{{ cant }}</td>
+            {% endfor %}
+          </tr>
         {% endfor %}
+      </tbody>
     </table>
-
-    <br><br>
-
-    <p>Total Handhelds en el parque: {{ total_handhelds }}</p>
-    <p>Handhelds disponibles en el parque: {{ disponible_handhelds }}</p>
-
+    <ul class="list-group">
+      <li class="list-group-item">
+        <span class="badge">{{ total_handhelds }}</span>
+        Total Handhelds
+      </li>
+      <li class="list-group-item">
+        <span class="badge">{{ disponible_handhelds }}</span>
+        Handhelds disponibles
+      </li>
+    </ul>
+  </div>
+  <div class="col-md-4">
+    <div class="list-group">
+      {% for incidente in incidentes_sin_revisar %}
+        <a href="{% url 'incidente_detail' pk=incidente.pk %}" class="list-group-item">ID {{ incidente.id }}: {{ incidente.descripcion }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
 {% endblock %}

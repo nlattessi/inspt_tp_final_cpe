@@ -1,11 +1,23 @@
-from django.core.urlresolvers import reverse
-from django.db import models
-from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
-from django.core.validators import RegexValidator
-from django.conf import settings
-
 from datetime import datetime
+
+from django.db import models
 from django.utils import timezone
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.core.validators import RegexValidator
+from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
+from django.contrib.contenttypes.models import ContentType
+
+
+class AdminURLMixin(object):
+    def get_admin_url(self):
+        content_type = ContentType \
+            .objects \
+            .get_for_model(self.__class__)
+        return reverse("admin:%s_%s_change" % (
+            content_type.app_label,
+            content_type.model),
+            args=(self.id,))
 
 
 class MyUserManager(BaseUserManager):
@@ -89,7 +101,7 @@ class Sucursal(models.Model):
         return "{}-{}".format(self.codigo, self.nombre)
 
 
-class Handheld(models.Model):
+class Handheld(AdminURLMixin, models.Model):
     once_caracteres = RegexValidator(r'^[0-9a-zA-Z]{11}$',
                                      'Numero de serie debe de ser 11 caracteres alfanumericos.')
 
@@ -112,9 +124,11 @@ class HandheldCambioEstado(models.Model):
     handheld = models.ForeignKey(Handheld)
     fecha_cambio = models.DateTimeField(auto_now=True)
     estado_anterior = models.ForeignKey(Estado,
-                                        related_name='handheld_estadio_anterior')
-    nuevo_estado = models.ForeignKey(
-        Estado, related_name='handheld_nuevo_estado')
+        related_name='handheld_estadio_anterior'
+    )
+    nuevo_estado = models.ForeignKey(Estado,
+        related_name='handheld_nuevo_estado'
+    )
     observacion = models.TextField(blank=True)
 
     def __str__(self):
@@ -128,7 +142,7 @@ class ModalidadVendedor(models.Model):
         return self.nombre
 
 
-class Vendedor(models.Model):
+class Vendedor(AdminURLMixin, models.Model):
     ocho_numeros = RegexValidator(r'^[0-9]{8}$', 'Legajo debe ser 8 numeros.')
 
     legajo = models.CharField(max_length=8, unique=True,
@@ -149,14 +163,15 @@ class TipoIncidente(models.Model):
         return self.nombre
 
 
-class Incidente(models.Model):
+class Incidente(AdminURLMixin, models.Model):
     tipo = models.ForeignKey(TipoIncidente, related_name='tipo_incidente')
     descripcion = models.TextField()
-    solucion = models.TextField()
+    acciones = models.TextField(blank=True, null=True)
     handheld = models.ForeignKey(Handheld, blank=True, null=True)
     vendedor = models.ForeignKey(Vendedor, blank=True, null=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     fecha_carga = models.DateTimeField(default=timezone.now)
+    revisado = models.BooleanField(default=False)
 
     def __str__(self):
         return "{}".format(self.id)

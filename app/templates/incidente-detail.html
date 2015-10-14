@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% load admin_urls %}
+
+{% block titulo %}Detalle Incidente - {{ block.super }}{% endblock %}
+{% block contenido %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li class="active">Detalle Incidente</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">ID: {{ incidente.pk }}</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <span class="label label-default">Tipo:</span>
+            <span class="label label-primary">{{ incidente.tipo }}</span>
+          </li>
+          <li class="list-group-item">
+            <span class="label label-default">Handheld:</span>
+            {% if incidente.handheld %}
+              <a href="{% url 'handheld_detail' pk=incidente.handheld.pk %}"><span class="label label-primary">{{ incidente.handheld }}</span></a>
+            {% else %}
+              <span class="label label-primary">---</span>
+            {% endif %}
+          </li>
+          <li class="list-group-item">
+            <span class="label label-default">Vendedor:</span>
+            {% if incidente.vendedor %}
+              <a href="{% url 'vendedor_detail' pk=incidente.vendedor.pk }}"><span class="label label-primary">{{ incidente.vendedor }}</span></a>
+            {% else %}
+              <span class="label label-primary">---</span>
+            {% endif %}
+          </li>
+          <li class="list-group-item">
+            <span class="label label-default">Creado por:</span>
+            {% if incidente.usuario %}
+              <span class="label label-primary">{{ incidente.usuario }}</span>
+            {% else %}
+              <span class="label label-primary">---</span>
+            {% endif %}
+          </li>
+          <li class="list-group-item">
+            <span class="label label-default">Fecha:</span>
+            <span class="label label-primary">{{ incidente.fecha_carga|date:'d/m/Y' }}</span>
+          </li>
+          <li class="list-group-item">
+            <span class="label label-default">Revisado?</span>
+            {% if incidente.revisado %}
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            {% else %}
+              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            {% endif %}
+          </li>
+        </ul>
+        <div class="panel panel-info">
+          <div class="panel-heading">Descripcion</div>
+          <div class="panel-body">
+            {{ incidente.descripcion }}
+          </div>
+        </div>
+        <div class="panel panel-success">
+          <div class="panel-heading">Acciones realizadas</div>
+          <div class="panel-body">
+            {{ incidente.acciones }}
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        {% if user.is_admin %}
+          {% if incidente.revisado %}
+          <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-warning">Editar</a>
+          <button class="btn btn-xs btn-info pull-right" onClick="javascript:history.go(-1);">Volver</button>
+          {% else %}
+            <form role="form" action="{% url 'revisar_incidente' pk=incidente.pk %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-xs btn-primary">Marcar como revisado</button>
+              <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-warning">Editar</a>
+              <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
+            </form>
+          {% endif %}
+        {% else %}
+          <button onclick="javascript: window.history.go(-1)" class="btn btn-xs btn-info">Volver</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

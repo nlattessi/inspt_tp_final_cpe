@@ -1,30 +1,67 @@
 {% extends 'base.html' %}
+
+{% load staticfiles %}
+
 {% block titulo %}Vendedores - {{ block.super }}{% endblock %}
 {% block contenido %}
-    <h1>Lista Vendedores</h1>
-    {% include "_vendedor_buscar.html" %}
-    {% for vendedor in vendedores %}
-        <h3><u>Legajo</u>: {{ vendedor.legajo }}</h3>
-        <p><u>Modalidad</u>: {{ vendedor.modalidad }}</p>
-        <p><u>Nombre</u>: {{ vendedor.nombre }} {{ vendedor.apellido }}</p>
-        {% if vendedor.handheld %}
-            <p><u>Handheld asignada</u>: {{ vendedor.handheld.numero_de_serie }}</p>
-        {% else %}
-            <p><u>Sin asignar handheld</u></p>
-        {% endif %}
-        <p>
-            <a href="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}">
-                <button>Asignar nueva handheld</button>
-            </a>
-        </p>
-        {% if vendedor.handheld %}
-            <p>
-                <a href="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}">
-                    <button>Remover handheld asignada</button>
-                </a>
-            </p>
-        {% endif %}
-    {% empty %}
-        <h3><b>No se encuentran vendedores</b></h3>
-    {% endfor %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li class="active">Vendedores</li>
+    </ul>
+  </div>
+</div>
+
+{% include "_vendedor_buscar.html" %}
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Legajo</th>
+          <th>Nombre</th>
+          <th>Modalidad</th>
+          <th>Handheld asignada</th>
+          {% if user.is_admin %}
+            <th>Acciones</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for vendedor in vendedores %}
+        <tr>
+          <td><a href="{% url 'vendedor_detail' pk=vendedor.pk %}">{{ vendedor.legajo }}</a></td>
+          <td>{{ vendedor.nombre }} {{ vendedor.apellido }}</td>
+          <td>{{ vendedor.modalidad }}</td>
+          {% if vendedor.handheld %}
+            <td><a href="{% url 'handheld_detail' pk=vendedor.handheld.pk %}">{{ vendedor.handheld }}</a></td>
+          {% else %}
+            <td>---</td>
+          {% endif %}
+          {% if user.is_admin %}
+            <td>
+              <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#asignarModal" data-vendedor="{{ vendedor }}" data-vendedor-asignar-url="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Asignar nueva handheld</button>
+              {% if vendedor.handheld %}
+                <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#removerModal" data-vendedor="{{ vendedor }}" data-vendedor-remover-url="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Remover handheld asignada</button>
+              {% endif %}
+            </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- asignarModal -->
+{% include "_asignar_handheld_modal.html" %}
+<!-- removerModal -->
+{% include "_remover_handheld_modal.html" %}
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'js/asignar_handheld_modal.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/remover_handheld_modal.js' %}"></script>
 {% endblock %}

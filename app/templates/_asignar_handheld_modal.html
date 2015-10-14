@@ -1,0 +1,27 @@
+{% load widget_tweaks %}
+
+<div class="modal fade" id="asignarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">Asignar Handheld al vendedor: </h4>
+      </div>
+      <form role="form" action="" method="post" id="asignarForm">
+        {% csrf_token %}
+        <div class="modal-body">
+          {% for field in form %}
+          <div class="form-group">
+            {{ field.label_tag }}
+            {{ field|add_class:"form-control" }}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary">Asignar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
