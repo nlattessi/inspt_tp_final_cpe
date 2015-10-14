@@ -101,7 +101,7 @@ class Sucursal(models.Model):
         return "{}-{}".format(self.codigo, self.nombre)
 
 
-class Handheld(models.Model):
+class Handheld(AdminURLMixin, models.Model):
     once_caracteres = RegexValidator(r'^[0-9a-zA-Z]{11}$',
                                      'Numero de serie debe de ser 11 caracteres alfanumericos.')
 
@@ -142,7 +142,7 @@ class ModalidadVendedor(models.Model):
         return self.nombre
 
 
-class Vendedor(models.Model):
+class Vendedor(AdminURLMixin, models.Model):
     ocho_numeros = RegexValidator(r'^[0-9]{8}$', 'Legajo debe ser 8 numeros.')
 
     legajo = models.CharField(max_length=8, unique=True,

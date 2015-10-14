@@ -44,6 +44,7 @@
           {% if vendedor.handheld %}
             <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#removerModal" data-vendedor="{{ vendedor }}" data-vendedor-remover-url="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Remover handheld asignada</button>
           {% endif %}
+          <a href="{{ vendedor.get_admin_url }}" class="btn btn-xs btn-warning">Editar</a>
           <button onclick="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</button>
         {% else %}
           <button onclick="javascript: window.history.go(-1)" class="btn btn-xs btn-info">Volver</button>

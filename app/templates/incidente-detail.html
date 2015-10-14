@@ -27,7 +27,7 @@
           <li class="list-group-item">
             <span class="label label-default">Handheld:</span>
             {% if incidente.handheld %}
-              <span class="label label-primary">{{ incidente.handheld }}</span>
+              <a href="{% url 'handheld_detail' pk=incidente.handheld.pk %}"><span class="label label-primary">{{ incidente.handheld }}</span></a>
             {% else %}
               <span class="label label-primary">---</span>
             {% endif %}
@@ -35,7 +35,7 @@
           <li class="list-group-item">
             <span class="label label-default">Vendedor:</span>
             {% if incidente.vendedor %}
-              <span class="label label-primary">{{ incidente.vendedor }}</span>
+              <a href="{% url 'vendedor_detail' pk=incidente.vendedor.pk }}"><span class="label label-primary">{{ incidente.vendedor }}</span></a>
             {% else %}
               <span class="label label-primary">---</span>
             {% endif %}
@@ -77,13 +77,13 @@
       <div class="panel-footer">
         {% if user.is_admin %}
           {% if incidente.revisado %}
-          <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-primary">Editar en Panel de Administracion</a>
+          <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-warning">Editar</a>
           <button class="btn btn-xs btn-info pull-right" onClick="javascript:history.go(-1);">Volver</button>
           {% else %}
             <form role="form" action="{% url 'revisar_incidente' pk=incidente.pk %}" method="post">
               {% csrf_token %}
-              <button type="submit" class="btn btn-xs btn-success">Marcar como revisado</button>
-              <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-primary">Editar en Panel de Administracion</a>
+              <button type="submit" class="btn btn-xs btn-primary">Marcar como revisado</button>
+              <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-warning">Editar</a>
               <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
             </form>
           {% endif %}

@@ -7,8 +7,9 @@ from app import views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls), name='admin'),
 
-    url(r'^$', views.HomeView.as_view(), name='home'),
+    # url(r'^$', views.HomeView.as_view(), name='home'),
 
+    url(r'^$', views.dashboard, name='home'),
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
 
     url(r'^incidentes/$', views.IncidenteView.as_view(), name='incidentes'),

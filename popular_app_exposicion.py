@@ -19,24 +19,23 @@ def popular():
     crear_modalidades_vendedor()
     agregar_vendedores()
     crear_tipos_incidente()
-    agregar_incidentes()
+    # agregar_incidentes()
 
 
 def flush_base():
     print("Limpiando la base actual...")
     os.system("./manage.py flush --noinput --no-initial-data")
 
+
 def crear_superuser():
     print("Creando superuser...")
     MyUser.objects.create_superuser('admin', 'admin')
 
+
 def crear_usuarios():
     print("Creando usuarios...")
-    MyUser.objects.create_user('test', 'test')
-    MyUser.objects.create_user('demo', 'demo')
-    MyUser.objects.create_user('prueba1', 'prueba1')
-    MyUser.objects.create_user('prueba2', 'prueba2')
-    MyUser.objects.create_user('prueba3', 'prueba3')
+    MyUser.objects.create_user('operador', 'operador')
+
 
 def crear_estados():
     print("Creando estados...")
@@ -88,17 +87,47 @@ def agregar_vendedores():
     print("Agregando vendedores...")
     faker = Factory.create()
     modalidades = ModalidadVendedor.objects.all()
-    for i in range(0, 5):
-        legajo = ''.join(random.choice(string.digits) for _ in range(8))
-        modalidad = faker.random_element(modalidades)
-        nombre = faker.first_name()
-        apellido = faker.last_name()
-        Vendedor.objects.get_or_create(
-            legajo=legajo,
-            modalidad=modalidad,
-            nombre=nombre,
-            apellido=apellido
-        )
+    # for i in range(0, 5):
+    #     legajo = ''.join(random.choice(string.digits) for _ in range(8))
+    #     modalidad = faker.random_element(modalidades)
+    #     nombre = faker.first_name()
+    #     apellido = faker.last_name()
+    #     Vendedor.objects.get_or_create(
+    #         legajo=legajo,
+    #         modalidad=modalidad,
+    #         nombre=nombre,
+    #         apellido=apellido
+    #     )
+    Vendedor.objects.get_or_create(
+        legajo=''.join(random.choice(string.digits) for _ in range(8)),
+        modalidad=faker.random_element(modalidades),
+        nombre='Juan',
+        apellido='Perez'
+    )
+    Vendedor.objects.get_or_create(
+        legajo=''.join(random.choice(string.digits) for _ in range(8)),
+        modalidad=faker.random_element(modalidades),
+        nombre='Alberto',
+        apellido='Lopez'
+    )
+    Vendedor.objects.get_or_create(
+        legajo=''.join(random.choice(string.digits) for _ in range(8)),
+        modalidad=faker.random_element(modalidades),
+        nombre='Rodrigo',
+        apellido='Marquez'
+    )
+    Vendedor.objects.get_or_create(
+        legajo=''.join(random.choice(string.digits) for _ in range(8)),
+        modalidad=faker.random_element(modalidades),
+        nombre='Mariano',
+        apellido='Rodriguez'
+    )
+    Vendedor.objects.get_or_create(
+        legajo=''.join(random.choice(string.digits) for _ in range(8)),
+        modalidad=faker.random_element(modalidades),
+        nombre='Carlos',
+        apellido='Diaz'
+    )
 
 
 def crear_tipos_incidente():

@@ -321,6 +321,12 @@ def vendedor_remover_handheld(request, pk):
 
 
 def login_view(request):
+    if request.user.is_authenticated():
+        if request.GET.get('next'):
+            return redirect(request.GET['next'])
+        else:
+            return redirect('dashboard')
+
     if request.method == 'POST':
         form = LoginForm(data=request.POST)
         if form.is_valid():
