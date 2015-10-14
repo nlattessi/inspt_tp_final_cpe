@@ -75,16 +75,20 @@
         </div>
       </div>
       <div class="panel-footer">
-        {% if incidente.revisado %}
-        <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-primary">Editar en Panel de Administracion</a>
-        <button class="btn btn-xs btn-info pull-right" onClick="javascript:history.go(-1);">Volver</button>
+        {% if user.is_admin %}
+          {% if incidente.revisado %}
+          <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-primary">Editar en Panel de Administracion</a>
+          <button class="btn btn-xs btn-info pull-right" onClick="javascript:history.go(-1);">Volver</button>
+          {% else %}
+            <form role="form" action="{% url 'revisar_incidente' pk=incidente.pk %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-xs btn-success">Marcar como revisado</button>
+              <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-primary">Editar en Panel de Administracion</a>
+              <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
+            </form>
+          {% endif %}
         {% else %}
-          <form role="form" action="{% url 'revisar_incidente' pk=incidente.pk %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-xs btn-success">Marcar como revisado</button>
-            <a href="{{ incidente.get_admin_url }}" class="btn btn-xs btn-primary">Editar en Panel de Administracion</a>
-            <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
-          </form>
+          <button onclick="javascript: window.history.go(-1)" class="btn btn-xs btn-info">Volver</button>
         {% endif %}
       </div>
     </div>

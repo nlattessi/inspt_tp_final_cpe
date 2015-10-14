@@ -51,7 +51,7 @@ class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
 
 
-@login_and_admin
+@login_required
 def dashboard(request):
     estados = Estado.objects.all()
     sucursales = Sucursal.objects.order_by('nombre')
@@ -68,13 +68,19 @@ def dashboard(request):
         for handheld in Handheld.objects.filter(sucursal=sucursal):
             data[sucursal][handheld.estado] += 1
 
-    incidentes_sin_revisar = Incidente.objects.filter(revisado=False)
+    if request.user.is_admin:
+        total_incidentes_sin_revisar = Incidente.objects.filter(revisado=False).count
+        incidentes_sin_revisar = Incidente.objects.filter(revisado=False).order_by('fecha_carga')[:5]
+    else:
+        total_incidentes_sin_revisar = Incidente.objects.filter(revisado=False, usuario=request.user).count
+        incidentes_sin_revisar = Incidente.objects.filter(revisado=False, usuario=request.user).order_by('fecha_carga')[:5]
 
     return render(request, 'dashboard.html', {
         'data': data,
         'estados': estados,
         'total_handhelds': total_handhelds,
         'disponible_handhelds': disponible_handhelds,
+        'total_incidentes_sin_revisar': total_incidentes_sin_revisar,
         'incidentes_sin_revisar': incidentes_sin_revisar,
     })
 
@@ -111,7 +117,36 @@ class IncidenteDiaView(AdminRequiredMixin, ListView):
         context['titulo'] = 'Incidentes de hoy: ' + datetime.now().date().strftime("%d/%m/%Y")
         return context
 
-class IncidenteDetailView(AdminRequiredMixin, DetailView):
+class IncidenteSinRevisarView(AdminRequiredMixin, ListView):
+    model = Incidente
+    template_name = "incidentes.html"
+    context_object_name = 'incidentes'
+
+    def get_queryset(self):
+        queryset = super(IncidenteSinRevisarView, self).get_queryset()
+        return queryset.filter(revisado=False).order_by('-fecha_carga')
+
+    def get_context_data(self, **kwargs):
+        context = super(IncidenteSinRevisarView, self).get_context_data(**kwargs)
+        context['titulo'] = 'Incidentes sin revisar'
+        return context
+
+class IncidenteUsuarioView(LoginRequiredMixin, ListView):
+    model = Incidente
+    template_name = "incidentes.html"
+    context_object_name = 'incidentes'
+
+    def get_queryset(self):
+        queryset = super(IncidenteUsuarioView, self).get_queryset()
+        return queryset.filter(usuario=self.request.user).order_by('-fecha_carga')
+
+    def get_context_data(self, **kwargs):
+        context = super(IncidenteUsuarioView, self).get_context_data(**kwargs)
+        context['titulo'] = 'Incidentes del usuario:'
+        context['usuario'] = self. request.user
+        return context
+
+class IncidenteDetailView(LoginRequiredMixin, DetailView):
     model = Incidente
     template_name = "incidente-detail.html"
     context_object_name = "incidente"
@@ -123,7 +158,7 @@ def cargar_incidente(request):
         form = form_class(request.POST)
         if form.is_valid():
             incidente = form.save(commit=False)
-            incidente.user = request.user
+            incidente.usuario = request.user
             incidente.save()
             messages.success(request, 'Se cargo el incidente.')
             return redirect('incidente_detail', pk=incidente.pk)
@@ -143,7 +178,7 @@ def revisar_incidente(request, pk):
     return redirect ('incidente_detail', pk=incidente.pk)
 
 
-class HandheldBuscarView(AdminRequiredMixin, ListView):
+class HandheldBuscarView(LoginRequiredMixin, ListView):
     model = Handheld
     template_name = "handhelds.html"
     context_object_name = "handhelds"
@@ -159,30 +194,41 @@ class HandheldBuscarView(AdminRequiredMixin, ListView):
         context = super(HandheldBuscarView, self).get_context_data(**kwargs)
         if self.request.GET.get('q'):
             context['q'] = self.request.GET.get('q')
+        context['cambiarEstadoForm'] = HandheldCambiarEstadoForm
+        context['moverSucursalForm'] = HandheldMoverSucursalForm
         return context
 
-class HandheldDetailView(AdminRequiredMixin, DetailView):
+class HandheldDetailView(LoginRequiredMixin, DetailView):
     model = Handheld
     template_name = "handheld-detail.html"
     context_object_name = "handheld"
 
+    def get_context_data(self, **kwargs):
+        context = super(HandheldDetailView, self).get_context_data(**kwargs)
+        context['cambiarEstadoForm'] = HandheldCambiarEstadoForm
+        context['moverSucursalForm'] = HandheldMoverSucursalForm
+        return context
+
 @login_and_admin
 def handheld_cambiar_estado(request, pk):
     handheld = get_object_or_404(Handheld, pk=pk)
+    estado_anterior = handheld.estado
     form_class = HandheldCambiarEstadoForm
     if request.method == 'POST':
         form = form_class(data=request.POST, instance=handheld)
         if form.is_valid():
-            estado_anterior = handheld.estado
-            form.save()
-            nuevo_registro_historico = HandheldCambioEstado()
-            nuevo_registro_historico.handheld = handheld
-            nuevo_registro_historico.estado_anterior = estado_anterior
-            nuevo_registro_historico.nuevo_estado = form.cleaned_data['estado']
-            nuevo_registro_historico.observacion = form.cleaned_data['observacion']
-            nuevo_registro_historico.save()
-            messages.success(request, 'Se cambio el estado a la handheld.')
-            return redirect('home')
+            if form.cleaned_data['estado'] != estado_anterior:
+                form.save()
+                nuevo_registro_historico = HandheldCambioEstado()
+                nuevo_registro_historico.handheld = handheld
+                nuevo_registro_historico.estado_anterior = estado_anterior
+                nuevo_registro_historico.nuevo_estado = form.cleaned_data['estado']
+                nuevo_registro_historico.observacion = form.cleaned_data['observacion']
+                nuevo_registro_historico.save()
+                messages.success(request, 'Se cambio el estado a la handheld.')
+        if request.GET.get('return_url'):
+            return redirect(request.GET.get('return_url'))
+        return redirect('home')
     else:
         form = form_class(instance=handheld)
     return render(request, 'handheld_cambiar_estado.html', {
@@ -193,13 +239,17 @@ def handheld_cambiar_estado(request, pk):
 @login_and_admin
 def handheld_mover_sucursal(request, pk):
     handheld = get_object_or_404(Handheld, pk=pk)
+    sucursal_anterior = handheld.sucursal
     form_class = HandheldMoverSucursalForm
     if request.method == 'POST':
         form = form_class(data=request.POST, instance=handheld)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Se movio la handheld de sucursal.')
-            return redirect('home')
+            if form.cleaned_data['sucursal'] != sucursal_anterior:
+                form.save()
+                messages.success(request, 'Se movio la handheld de sucursal.')
+        if request.GET.get('return_url'):
+            return redirect(request.GET.get('return_url'))
+        return redirect('home')
     else:
         form = form_class(instance=handheld)
     return render(request, 'handheld_mover_sucursal.html', {
@@ -208,7 +258,7 @@ def handheld_mover_sucursal(request, pk):
     })
 
 
-class VendedorBuscarView(AdminRequiredMixin, ListView):
+class VendedorBuscarView(LoginRequiredMixin, ListView):
     model = Vendedor
     template_name = "vendedores.html"
     context_object_name = "vendedores"
@@ -227,15 +277,13 @@ class VendedorBuscarView(AdminRequiredMixin, ListView):
         context['form'] = VendedorCambiarHandheldForm
         return context
 
-class VendedorDetailView(AdminRequiredMixin, DetailView):
+class VendedorDetailView(LoginRequiredMixin, DetailView):
     model = Vendedor
     template_name = "vendedor-detail.html"
     context_object_name = "vendedor"
 
     def get_context_data(self, **kwargs):
         context = super(VendedorDetailView, self).get_context_data(**kwargs)
-        if self.request.GET.get('q'):
-            context['q'] = self.request.GET.get('q')
         context['form'] = VendedorCambiarHandheldForm
         return context
 
@@ -250,9 +298,9 @@ def vendedor_asignar_handheld(request, pk):
             vendedor.handheld = nueva_handheld
             vendedor.save()
             messages.success(request, 'Se asigno la handheld al vendedor.')
-            if request.GET.get('return_url'):
-                return redirect(request.GET.get('return_url'))
-            return redirect('home')
+        if request.GET.get('return_url'):
+            return redirect(request.GET.get('return_url'))
+        return redirect('home')
     else:
         form = form_class
     return render(request, 'vendedor_asignar_handheld.html', {
@@ -274,10 +322,6 @@ def vendedor_remover_handheld(request, pk):
         return render(request, 'vendedor_remover_handheld.html', {
             'vendedor': vendedor,
         })
-
-
-class ReportesView(AdminRequiredMixin, TemplateView):
-    template_name = 'reportes.html'
 
 
 def login_view(request):

@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 {% block titulo %}Denegado - {{ block.super }}{% endblock %}
 {% block contenido %}
-    <h1>Acceso denegado</h1>
-    <h2>Solo se permite acceso a un usuario Administrador</h2>
-    <ul>
-    <li><a href="{% url 'home' %}">Volver a Home</a></li>
-    <li><a href="{% url 'login' %}">Loguearse nuevamente</a></li>
-    </ul>
+    <div class="jumbotron">
+      <h1>Acceso denegado</h1>
+      <p>Solo se permite acceso a un usuario Administrador</p>
+      <p>
+        <a href="{% url 'home' %}" class="btn btn-primary btn-lg">Volver a Home</a>
+        <a href="{% url 'login' %}" class="btn btn-default btn-lg">Ingresar con otro usuario</a>
+      </p>
+    </div>
 {% endblock %}

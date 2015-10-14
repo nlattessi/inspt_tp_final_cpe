@@ -11,12 +11,16 @@
 <div class="row">
   <div class="col-md-8">
     <div class="well">
-      Handhelds X Estado X Sucursal
+      Stock Handhelds
     </div>
   </div>
   <div class="col-md-4">
     <div class="well">
-      Incidentes sin revisar
+      {% if user.is_admin %}
+        Ultimos Incidentes sin revisar (Total: <a href="{% url 'incidentes_sin_revisar' %}">{{ total_incidentes_sin_revisar}}</a>)
+      {% else %}
+        Mis ultimos Incidentes sin revisar (Total: <a href="{% url 'incidentes_sin_revisar' %}">{{ total_incidentes_sin_revisar}}</a>)
+      {% endif %}
     </div>
   </div>
 </div>
@@ -56,7 +60,7 @@
   <div class="col-md-4">
     <div class="list-group">
       {% for incidente in incidentes_sin_revisar %}
-      <a href="#" class="list-group-item">#{{ incidente.id }}: {{ incidente.descripcion }}</a>
+        <a href="{% url 'incidente_detail' pk=incidente.pk %}" class="list-group-item">ID {{ incidente.id }}: {{ incidente.descripcion }}</a>
       {% endfor %}
     </div>
   </div>

@@ -23,7 +23,9 @@
           <th>Nombre</th>
           <th>Modalidad</th>
           <th>Handheld asignada</th>
-          <th>Acciones</th>
+          {% if user.is_admin %}
+            <th>Acciones</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -37,12 +39,14 @@
           {% else %}
             <td>---</td>
           {% endif %}
-          <td>
-            <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#asignarModal" data-vendedor="{{ vendedor }}" data-vendedor-asignar-url="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Asignar nueva handheld</button>
-            {% if vendedor.handheld %}
-              <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#removerModal" data-vendedor="{{ vendedor }}" data-vendedor-remover-url="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Remover handheld asignada</button>
-            {% endif %}
-          </td>
+          {% if user.is_admin %}
+            <td>
+              <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#asignarModal" data-vendedor="{{ vendedor }}" data-vendedor-asignar-url="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Asignar nueva handheld</button>
+              {% if vendedor.handheld %}
+                <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#removerModal" data-vendedor="{{ vendedor }}" data-vendedor-remover-url="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Remover handheld asignada</button>
+              {% endif %}
+            </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>

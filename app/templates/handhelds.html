@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+
+{% load staticfiles %}
+
 {% block titulo %}Handhelds - {{ block.super }}{% endblock %}
 {% block contenido %}
 <div class="row">
@@ -22,7 +25,9 @@
           <th>Fecha del ultimo cambio</th>
           <th>Asignada al vendedor</th>
           <th>Asignada a la sucursal</th>
-          <th>Acciones</th>
+          {% if user.is_admin %}
+            <th>Acciones</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -42,14 +47,27 @@
           {% else %}
             <td>---</td>
           {% endif %}
-          <td>
-            <a href="{% url 'handheld_cambiar_estado' pk=handheld.pk %}" class="btn btn-xs btn-default">Cambiar estado</a>
-            <a href="{% url 'handheld_mover_sucursal' pk=handheld.pk %}" class="btn btn-xs btn-primary">Mover de sucursal</a>
-          </td>
+          {% if user.is_admin %}
+            <td>
+              <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cambiarModal" data-handheld="{{ handheld }}" data-handheld-estado="{{ handheld.estado.pk }}" data-handheld-cambiar-url="{% url 'handheld_cambiar_estado' pk=handheld.pk %}?return_url={{ request.path }}">Cambiar estado</button>
+              <button type="button" class="btn btn-xs btn-primary" data-toggle="modal" data-target="#moverModal" data-handheld="{{ handheld }}" data-handheld-sucursal="{{ handheld.sucursal.pk }}" data-handheld-mover-url="{% url 'handheld_mover_sucursal' pk=handheld.pk %}?return_url={{ request.path }}">Mover de sucursal</button>
+            </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+
+<!-- cambiarEstadoModal -->
+{% include "_cambiar_handheld_estado_modal.html" %}
+<!-- moveSucursalModal -->
+{% include "_mover_handheld_sucursal_modal.html" %}
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'js/cambiar_handheld_estado_modal.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/mover_handheld_sucursal_modal.js' %}"></script>
 {% endblock %}

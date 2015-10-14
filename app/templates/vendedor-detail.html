@@ -39,11 +39,15 @@
         </ul>
       </div>
       <div class="panel-footer">
-        <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#asignarModal" data-vendedor="{{ vendedor }}" data-vendedor-asignar-url="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Asignar nueva handheld</button>
-        {% if vendedor.handheld %}
-          <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#removerModal" data-vendedor="{{ vendedor }}" data-vendedor-remover-url="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Remover handheld asignada</button>
+        {% if user.is_admin %}
+          <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#asignarModal" data-vendedor="{{ vendedor }}" data-vendedor-asignar-url="{% url 'vendedor_asignar_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Asignar nueva handheld</button>
+          {% if vendedor.handheld %}
+            <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#removerModal" data-vendedor="{{ vendedor }}" data-vendedor-remover-url="{% url 'vendedor_remover_handheld' pk=vendedor.pk %}?return_url={{ request.path }}">Remover handheld asignada</button>
+          {% endif %}
+          <button onclick="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</button>
+        {% else %}
+          <button onclick="javascript: window.history.go(-1)" class="btn btn-xs btn-info">Volver</button>
         {% endif %}
-        <a href="javascript: window.history.go(-1)" class="btn btn-xs btn-info pull-right">Volver</a>
       </div>
     </div>
   </div>

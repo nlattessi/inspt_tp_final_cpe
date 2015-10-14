@@ -1,14 +1,14 @@
-from django.core.urlresolvers import reverse
-from django.db import models
-from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
-from django.core.validators import RegexValidator
-from django.conf import settings
-
 from datetime import datetime
-from django.utils import timezone
 
-from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.utils import timezone
+from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.validators import RegexValidator
+from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
+from django.contrib.contenttypes.models import ContentType
+
+
 class AdminURLMixin(object):
     def get_admin_url(self):
         content_type = ContentType \
