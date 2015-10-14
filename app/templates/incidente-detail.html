@@ -35,7 +35,7 @@
           <li class="list-group-item">
             <span class="label label-default">Vendedor:</span>
             {% if incidente.vendedor %}
-              <a href="{% url 'vendedor_detail' pk=incidente.vendedor.pk }}"><span class="label label-primary">{{ incidente.vendedor }}</span></a>
+              <a href="{% url 'vendedor_detail' pk=incidente.vendedor.pk %}"><span class="label label-primary">{{ incidente.vendedor }}</span></a>
             {% else %}
               <span class="label label-primary">---</span>
             {% endif %}

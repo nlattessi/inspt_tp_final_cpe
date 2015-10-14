@@ -132,7 +132,7 @@ def agregar_vendedores():
 
 def crear_tipos_incidente():
     print("Creando tipos de incidente...")
-    tipos = ('comunicacion', 'hardware', 'otros')
+    tipos = ('software', 'hardware', 'otros', 'asignacion')
     for tipo in tipos:
         t = TipoIncidente.objects.create(nombre=tipo)
 
