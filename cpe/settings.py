@@ -114,4 +114,4 @@ STATICFILES_DIRS = (
 AUTH_USER_MODEL = 'app.MyUser'
 
 # Auth URLs
-LOGIN_REDIRECT_URL = 'app.views.home'
+LOGIN_REDIRECT_URL = 'app.views.dashboard'

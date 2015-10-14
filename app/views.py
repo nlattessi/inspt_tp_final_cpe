@@ -68,12 +68,8 @@ def dashboard(request):
         for handheld in Handheld.objects.filter(sucursal=sucursal):
             data[sucursal][handheld.estado] += 1
 
-    if request.user.is_admin:
-        total_incidentes_sin_revisar = Incidente.objects.filter(revisado=False).count
-        incidentes_sin_revisar = Incidente.objects.filter(revisado=False).order_by('fecha_carga')[:5]
-    else:
-        total_incidentes_sin_revisar = Incidente.objects.filter(revisado=False, usuario=request.user).count
-        incidentes_sin_revisar = Incidente.objects.filter(revisado=False, usuario=request.user).order_by('fecha_carga')[:5]
+    total_incidentes_sin_revisar = Incidente.objects.filter(revisado=False).count
+    incidentes_sin_revisar = Incidente.objects.filter(revisado=False).order_by('fecha_carga')[:5]
 
     return render(request, 'dashboard.html', {
         'data': data,
@@ -85,7 +81,7 @@ def dashboard(request):
     })
 
 
-class IncidenteView(AdminRequiredMixin, ListView):
+class IncidenteView(LoginRequiredMixin, ListView):
     model = Incidente
     template_name = "incidentes.html"
     context_object_name = 'incidentes'
@@ -99,7 +95,7 @@ class IncidenteView(AdminRequiredMixin, ListView):
         context['titulo'] = 'Todos los incidentes'
         return context
 
-class IncidenteDiaView(AdminRequiredMixin, ListView):
+class IncidenteDiaView(LoginRequiredMixin, ListView):
     model = Incidente
     template_name = "incidentes.html"
     context_object_name = "incidentes"
@@ -117,7 +113,7 @@ class IncidenteDiaView(AdminRequiredMixin, ListView):
         context['titulo'] = 'Incidentes de hoy: ' + datetime.now().date().strftime("%d/%m/%Y")
         return context
 
-class IncidenteSinRevisarView(AdminRequiredMixin, ListView):
+class IncidenteSinRevisarView(LoginRequiredMixin, ListView):
     model = Incidente
     template_name = "incidentes.html"
     context_object_name = 'incidentes'
@@ -228,7 +224,7 @@ def handheld_cambiar_estado(request, pk):
                 messages.success(request, 'Se cambio el estado a la handheld.')
         if request.GET.get('return_url'):
             return redirect(request.GET.get('return_url'))
-        return redirect('home')
+        return redirect('handheld_detail', pk=handheld.pk)
     else:
         form = form_class(instance=handheld)
     return render(request, 'handheld_cambiar_estado.html', {
@@ -249,7 +245,7 @@ def handheld_mover_sucursal(request, pk):
                 messages.success(request, 'Se movio la handheld de sucursal.')
         if request.GET.get('return_url'):
             return redirect(request.GET.get('return_url'))
-        return redirect('home')
+        return redirect('handheld_detail', pk=handheld.pk)
     else:
         form = form_class(instance=handheld)
     return render(request, 'handheld_mover_sucursal.html', {
@@ -300,7 +296,7 @@ def vendedor_asignar_handheld(request, pk):
             messages.success(request, 'Se asigno la handheld al vendedor.')
         if request.GET.get('return_url'):
             return redirect(request.GET.get('return_url'))
-        return redirect('home')
+        return redirect('handheld_detail', pk=handheld.pk)
     else:
         form = form_class
     return render(request, 'vendedor_asignar_handheld.html', {
@@ -336,7 +332,7 @@ def login_view(request):
                     if request.GET.get('next'):
                         return redirect(request.GET['next'])
                     else:
-                        return redirect('home')
+                        return redirect('dashboard')
     else:
         form = LoginForm()
 

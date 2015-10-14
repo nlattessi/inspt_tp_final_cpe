@@ -124,9 +124,11 @@ class HandheldCambioEstado(models.Model):
     handheld = models.ForeignKey(Handheld)
     fecha_cambio = models.DateTimeField(auto_now=True)
     estado_anterior = models.ForeignKey(Estado,
-                                        related_name='handheld_estadio_anterior')
-    nuevo_estado = models.ForeignKey(
-        Estado, related_name='handheld_nuevo_estado')
+        related_name='handheld_estadio_anterior'
+    )
+    nuevo_estado = models.ForeignKey(Estado,
+        related_name='handheld_nuevo_estado'
+    )
     observacion = models.TextField(blank=True)
 
     def __str__(self):

@@ -16,11 +16,7 @@
   </div>
   <div class="col-md-4">
     <div class="well">
-      {% if user.is_admin %}
-        Ultimos Incidentes sin revisar (Total: <a href="{% url 'incidentes_sin_revisar' %}">{{ total_incidentes_sin_revisar}}</a>)
-      {% else %}
-        Mis ultimos Incidentes sin revisar (Total: <a href="{% url 'incidentes_sin_revisar' %}">{{ total_incidentes_sin_revisar}}</a>)
-      {% endif %}
+      Ultimos Incidentes sin revisar (Total: <a href="{% url 'incidentes_sin_revisar' %}">{{ total_incidentes_sin_revisar}}</a>)
     </div>
   </div>
 </div>
