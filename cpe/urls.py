@@ -16,6 +16,16 @@ urlpatterns = [
     url(r'^incidentes_dia/$', views.IncidenteDiaView.as_view(),
         name='incidentes_dia'),
 
+    url(r'^incidentes_sin_revisar/$',
+        views.IncidenteSinRevisarView.as_view(),
+        name='incidentes_sin_revisar'
+    ),
+
+    url(r'^incidentes_usuario/$',
+        views.IncidenteUsuarioView.as_view(),
+        name='incidentes_usuario'
+    ),
+
     url(r'^incidentes/(?P<pk>[0-9]+)/$',
         views.IncidenteDetailView.as_view(),
         name='incidente_detail'
